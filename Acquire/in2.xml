@@ -1,0 +1,46 @@
+<!-- Using Sequential Strategy -->
+<take-turn>
+	<player cash="4800">
+		<share name="American" count="3" />
+		<share name="Imperial" count="5" />
+		<share name="Continental" count="3" />
+	</player>
+	<board>
+		<tile column="4" row="I" />
+		<tile column="7" row="D" />
+		<tile column="6" row="D" />
+		<tile column="2" row="B" />
+		<tile column="3" row="B" />
+		<tile column="1" row="C" />
+		<tile column="1" row="D" />
+		<hotel name="American">
+			<tile column="2" row="B" />
+			<tile column="3" row="B" />
+		</hotel>
+		<hotel name="Imperial">
+			<tile column="1" row="C" />
+			<tile column="1" row="D" />
+		</hotel>
+		<hotel name="Continental">
+			<tile column="7" row="D" />
+			<tile column="6" row="D" />
+		</hotel>
+	</board>
+	<tile column="9" row="G" />
+	<tile column="1" row="B" />
+	<tile column="7" row="F" />
+	<tile column="10" row="H" />
+	<tile column="5" row="C" />
+	<tile column="5" row="E" />
+	<share name="American" count="1" />
+	<share name="Worldwide" count="25" />
+	<share name="Imperial" count="1" />
+	<share name="Tower" count="25" />
+	<share name="Sackson" count="25" />
+	<share name="Continental" count="1" />
+	<share name="Festival" count="25" />
+	<hotel label="Worldwide" />
+	<hotel label="Tower" />
+	<hotel label="Sackson" />
+	<hotel label="Festival" />
+</take-turn>
