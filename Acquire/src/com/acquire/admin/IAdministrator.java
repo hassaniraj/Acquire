@@ -16,6 +16,7 @@ import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Hotel;
 import com.acquire.board.Labels;
+import com.acquire.board.SharePriceMapper;
 import com.acquire.board.Tile;
 import com.acquire.factory.AcquireActionsFactory;
 import com.acquire.factory.BoardFactory;
@@ -35,7 +36,7 @@ public class IAdministrator implements Administrator {
 		randomTileGenerator = random;
 		allTiles = tiles;
 	}
-	
+
 	public static synchronized Administrator getInstance() {
 		if (administrator == null) {
 			administrator = new IAdministrator();
@@ -147,16 +148,64 @@ public class IAdministrator implements Administrator {
 		return 0;
 	}
 
+	//Get the hotel shares and set the new share price
 	@Override
 	public void getHotelShares(Board board, Player player, String label) {
 		int share = Share.getShare(label);
 		if (Chain.getChain(label).size() > 0) {
-		if (share > 0 && player.getCash() > Share.getSharePrice(label)) {
-			Share.setShare(label, --share);
-			player.setShare(label, player.getShare(label) + 1);
-			player.setCash(player.getCash() - 300);
+			if (share > 0 && player.getCash() > Share.getSharePrice(label)) {
+				int chainSize = Chain.getChain(label).size();
+				Share.setShare(label, --share);
+				if (label.equalsIgnoreCase("WorldWide")
+						|| label.equalsIgnoreCase("Sackson")) {
+					if (SharePriceMapper.getWorldwideSacksonPriceMap()
+							.containsKey(chainSize)) {
+						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+					} else {
+						setSharePriceAndCashWhenExactSharesNotAvailable(player,
+								label, chainSize);
+					}
+				} else if (label.equalsIgnoreCase("Festival")
+						|| label.equalsIgnoreCase("Imperial")
+						|| label.equalsIgnoreCase("American")) {
+					if (SharePriceMapper.getWorldwideSacksonPriceMap()
+							.containsKey(chainSize)) {
+						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+					} else {
+						setSharePriceAndCashWhenExactSharesNotAvailable(player,
+								label, chainSize);
+					}
+				} else if (SharePriceMapper.getWorldwideSacksonPriceMap()
+						.containsKey(chainSize)) {
+					setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+				} else {
+					setSharePriceAndCashWhenExactSharesNotAvailable(player,
+							label, chainSize);
+				}
+				player.setShare(label, player.getShare(label) + 1);
+				// player.setCash(player.getCash() - 300);
+			}
 		}
-		}
+	}
+
+	private void setSharePriceAndCashWhenExactSharesNotAvailable(Player player,
+			String label, int chainSize) {
+		Share.setSharePrice(label,
+				SharePriceMapper.getWorldwideSacksonPriceMap()
+						.lowerEntry(chainSize).getValue());
+		player.setCash(player.getCash()
+				- SharePriceMapper
+						.getWorldwideSacksonPriceMap()
+						.lowerEntry(chainSize).getValue());
+	}
+
+	private void setSharePriceAndCashWhenExactSharesAvailable(Player player, String label, int chainSize) {
+		Share.setSharePrice(label, SharePriceMapper
+				.getWorldwideSacksonPriceMap().get(chainSize));
+		player.setCash(player.getCash()
+				- SharePriceMapper
+						.getWorldwideSacksonPriceMap().get(
+								chainSize));
 	}
 
 	@Override
@@ -181,19 +230,19 @@ public class IAdministrator implements Administrator {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	public Player getCurrentPlayer() {
 		return currentPlayer;
 
 	}
-	
+
 	@Override
 	public void setCurrentPlayer(Player player) {
 		currentPlayer = player;
 
 	}
-	
+
 	@Override
 	public void done(Player player, Board board) {
 		if (pickTiles() != null) {
@@ -207,7 +256,7 @@ public class IAdministrator implements Administrator {
 			playerIterator = Game.getInstance().getGame(board).iterator();
 			currentPlayer = playerIterator.next();
 		}
-		
+
 	}
 
 }
