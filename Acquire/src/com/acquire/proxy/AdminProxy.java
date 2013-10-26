@@ -1,8 +1,11 @@
 package com.acquire.proxy;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.acquire.admin.Administrator;
 import com.acquire.admin.IAdministrator;
@@ -55,4 +58,18 @@ public class AdminProxy implements AdminController{
 			return true;
 		return false;
 	}
+
+	@Override
+	public Player getWinner() {
+		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		Player winner=null;
+		TreeMap<Player, Integer> playerWorthMap = new TreeMap<>();
+		for (Player player : players) {
+			int finalWorth = admin.getWorth(player);
+			playerWorthMap.put(player, finalWorth);
+		}
+		winner=playerWorthMap.keySet().iterator().next();
+		return winner;
+	}
+	
 }

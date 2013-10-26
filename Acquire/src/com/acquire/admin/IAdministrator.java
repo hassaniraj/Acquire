@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -275,6 +276,21 @@ public class IAdministrator implements Administrator {
 			if (Chain.getChain(chainName).size() >= 41) return true;
 		}
 		return false;
+	}
+
+	@Override
+	public int getWorth(Player player) {
+		Map<String, Integer> playerShares = player.getShares();
+		int cash = player.getCash();
+		int	worthOfAPlayer=0;
+		for (Map.Entry<String, Integer> playerSharesEntry : playerShares
+				.entrySet()) {
+			String label = playerSharesEntry.getKey();
+			int numberOfShares = playerSharesEntry.getValue();
+			int sharePrice = Share.getSharePrice(label);
+			worthOfAPlayer=(sharePrice*numberOfShares)+cash;
+		}
+		return worthOfAPlayer;
 	}
 
 }

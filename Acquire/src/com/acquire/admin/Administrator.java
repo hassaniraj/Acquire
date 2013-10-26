@@ -64,4 +64,6 @@ public interface Administrator {
 	void setAllTiles(Board board);
 
 	boolean isEnd();
+	
+	int getWorth(Player player);
 }
