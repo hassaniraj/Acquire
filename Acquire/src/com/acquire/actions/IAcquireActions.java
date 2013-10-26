@@ -32,12 +32,15 @@ public class IAcquireActions implements AcquireActions {
 
 		if (neighbors.size() > 1) {
 			Set<String> set = new HashSet<>(hotels);
-			//for (String h : hotels) {
-				if (set.size() == 1) {
-					return "growing";
+			// for (String h : hotels) {
+			if (set.size() == 1) {
+				if (hotels.get(0).equals("singleton")) {
+					return "founding";
 				} else
-					return "merging";
-			//}
+					return "growing";
+			} else
+				return "merging";
+			// }
 		} else if (neighbors.size() == 1 && hotels.get(0).equals("singleton")) {
 			return "founding";
 		} else if (neighbors.size() == 1 && !hotels.isEmpty()) {
@@ -103,12 +106,14 @@ public class IAcquireActions implements AcquireActions {
 		String nextCol = String.valueOf((char) (charValue + 1));
 		String prevCol = String.valueOf((char) (charValue - 1));
 		List<String> neighbors = checkNeighbor(r, prevCol, nextCol, row, board);
-		for (String tile: neighbors) {
-			Chain.setChain(label, tile);
-		}
 		if (type.equalsIgnoreCase("founding")) {
 			Hotel hotel = new Hotel();
 			hotel.setLabel(label);
+			for (String tile : neighbors) {
+				Chain.setChain(label, tile);
+				board.getBoard().put(tile, hotel);
+			}
+
 			Chain.setChain(label, column + row);
 			board.getBoard().put(column + row, hotel);
 			return true;
@@ -128,33 +133,54 @@ public class IAcquireActions implements AcquireActions {
 
 			if (checkIfEqual()) {
 				maxLabel = label;
-			}
-			else if (!impossible()) {
+			} else if (!impossible()) {
 				for (String hotel : hotels) {
+					if (!hotel.equals("singleton")) {
 					List<String> chain = Chain.getChain(hotel);
 					if (max < chain.size()) {
 						max = chain.size();
 						maxLabel = hotel;
 					}
+					}
 				}
-			}
-			else
+			} else
 				return null;
-			
+
 			Hotel hotel = new Hotel();
 			hotel.setLabel(maxLabel);
 			board.getBoard().put(column + row, hotel);
+			Chain.setChain(maxLabel, column + row);
 			acquired.add(maxLabel);
 			for (String hotelName : hotels) {
 				if (!hotelName.equals(maxLabel)) {
 					acquired.add(hotelName);
 					List<String> chain = Chain.getChain(hotelName);
-					if (chain!=null)
-					for (String tile : chain)
-						Chain.setChain(maxLabel, tile);
-					Chain.getChain(hotelName).clear();
+					if (chain != null) {
+						for (String tile : chain) {
+							Hotel h = new Hotel();
+							h.setLabel(maxLabel);
+							board.getBoard().remove(tile);
+							board.getBoard().put(tile, h);
+							Chain.setChain(maxLabel, tile);
+						}
+						Chain.getChain(hotelName).clear();
+					}
 				}
 
+			}
+			int r = Integer.parseInt(column);
+			int charValue = row.charAt(0);
+			String nextCol = String.valueOf((char) (charValue + 1));
+			String prevCol = String.valueOf((char) (charValue - 1));
+			List<String> neighbours = checkNeighbor(r, prevCol, nextCol, row,
+					board);
+
+			for (String neighbour : neighbours) {
+				if (board.getBoard().get(neighbour).getLabel()
+						.equals("singleton")) {
+					board.getBoard().put(neighbour, hotel);
+					Chain.setChain(maxLabel, neighbour);
+				}
 			}
 			return acquired;
 		}
@@ -165,10 +191,10 @@ public class IAcquireActions implements AcquireActions {
 	public Map<String, List<String>> getLabel(Board board, String row,
 			String column) {
 		inspect(board, row, column);
-		Map <String, List<String>> chains = new HashMap<>();
-		for(String hotel: hotels) {
+		Map<String, List<String>> chains = new HashMap<>();
+		for (String hotel : hotels) {
 			if (!hotel.equals("singleton"))
-			chains.put(hotel, Chain.getChain(hotel));
+				chains.put(hotel, Chain.getChain(hotel));
 		}
 		return chains;
 	}
@@ -177,30 +203,30 @@ public class IAcquireActions implements AcquireActions {
 		int max = 0;
 		for (String hotel : hotels) {
 			if (!hotel.equals("singleton")) {
-			List<String> chain = Chain.getChain(hotel);
-			if (max != chain.size() && max != 0) {
-				max = chain.size();
-				return false;
+				List<String> chain = Chain.getChain(hotel);
+				if (max != chain.size() && max != 0) {
+					max = chain.size();
+					return false;
+				} else {
+					max = chain.size();
+				}
 			}
-			else {
-				max = chain.size();
-			}
-		}
 		}
 		return true;
 	}
-	
+
 	public boolean impossible() {
 		int max = 0;
 		for (String hotel : hotels) {
-			List<String> chain = Chain.getChain(hotel);
-			if (max != chain.size() && max != 0) {
-				max = chain.size();
-			}
-			else {
-				if (max >= 11 && max == chain.size())
-					return true;
-				max = chain.size();
+			if (!hotel.equals("singleton")) {
+				List<String> chain = Chain.getChain(hotel);
+				if (max != chain.size() && max != 0) {
+					max = chain.size();
+				} else {
+					if (max >= 11 && max == chain.size())
+						return true;
+					max = chain.size();
+				}
 			}
 		}
 		return false;

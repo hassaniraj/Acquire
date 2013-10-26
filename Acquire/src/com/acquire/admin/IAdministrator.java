@@ -5,17 +5,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
-
-import org.mockito.asm.tree.IntInsnNode;
+import java.util.Set;
 
 import com.acquire.actions.AcquireActions;
-import com.acquire.actions.IAcquireActions;
 import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Hotel;
-import com.acquire.board.Labels;
 import com.acquire.board.SharePriceMapper;
 import com.acquire.board.Tile;
 import com.acquire.factory.AcquireActionsFactory;
@@ -90,21 +86,32 @@ public class IAdministrator implements Administrator {
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
 		String type = acquireActions.inspect(board, tile.row, tile.column);
+		System.out.println(type);
 		if (type.equals("singleton")) {
 			acquireActions.singleton(board, tile.row, tile.column);
+			player.removeTile(tile);
 		} else if (type.equals("growing")) {
 			acquireActions.growing(board, tile.row, tile.column);
-		} else if (type.equals("founding")) {
+			player.removeTile(tile);
+		} else if (type.equals("founding") && !label.equals("") && label != null) {
 			acquireActions.founding(board, tile.row, tile.column, label);
 			player.setShare(label, player.getShare(label) + 1);
 			Share.setShare(label, Share.getShare(label) - 1);
+			player.removeTile(tile);
+			
 		} else if (type.equals("merging")) {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
 					board, tile.row, tile.column);
 			List<String> h = new ArrayList<String>(hotelList.keySet());
 			acquireActions.merging(board, tile.row, tile.column, h.get(0));
+			player.removeTile(tile);
+		} else {
+			Hotel hotel = new Hotel();
+			hotel.setLabel("singleton");
+			board.getBoard().put(tile.column + tile.row, hotel);
+			player.removeTile(tile);
 		}
-		player.removeTile(tile);
+		
 		return type;
 	}
 
@@ -257,6 +264,15 @@ public class IAdministrator implements Administrator {
 			currentPlayer = playerIterator.next();
 		}
 
+	}
+	
+	@Override
+	public boolean isEnd() {
+		Set<String> chainLabels = Chain.getChainLabel();
+		for (String chainName: chainLabels) {
+			if (Chain.getChain(chainName).size() >= 41) return true;
+		}
+		return false;
 	}
 
 }

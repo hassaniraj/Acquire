@@ -2,8 +2,10 @@ package com.acquire.board;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Chain {
 	private static Map <String, List<String>> chains;
@@ -21,6 +23,14 @@ public class Chain {
 	
 	public static synchronized int getChainSize() {
 		return chains.size();
+	}
+	
+	public static synchronized Set<String> getChainLabel() {
+		Set <String> labels = new HashSet<>();
+		for (String label: chains.keySet())
+			if (chains.get(label).isEmpty())
+				labels.add(label);
+		return labels;
 	}
 	
 	public static synchronized void setChain(String name, String tile) {

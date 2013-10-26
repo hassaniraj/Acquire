@@ -62,4 +62,6 @@ public interface Administrator {
 	void initTiles(Random random, List<String> tiles);
 
 	void setAllTiles(Board board);
+
+	boolean isEnd();
 }
