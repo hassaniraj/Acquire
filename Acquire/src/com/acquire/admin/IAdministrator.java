@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.acquire.actions.AcquireActions;
 import com.acquire.board.Board;
@@ -165,29 +166,33 @@ public class IAdministrator implements Administrator {
 				Share.setShare(label, --share);
 				if (label.equalsIgnoreCase("WorldWide")
 						|| label.equalsIgnoreCase("Sackson")) {
+					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getWorldwideSacksonPriceMap();
 					if (SharePriceMapper.getWorldwideSacksonPriceMap()
 							.containsKey(chainSize)) {
-						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize,priceMapper);
 					} else {
 						setSharePriceAndCashWhenExactSharesNotAvailable(player,
-								label, chainSize);
+								label, chainSize,priceMapper);
 					}
 				} else if (label.equalsIgnoreCase("Festival")
 						|| label.equalsIgnoreCase("Imperial")
 						|| label.equalsIgnoreCase("American")) {
-					if (SharePriceMapper.getWorldwideSacksonPriceMap()
+					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getFestivalImperialAmericanPriceMap();
+					if (priceMapper
 							.containsKey(chainSize)) {
-						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize,priceMapper);
 					} else {
 						setSharePriceAndCashWhenExactSharesNotAvailable(player,
-								label, chainSize);
+								label, chainSize,priceMapper);
 					}
-				} else if (SharePriceMapper.getWorldwideSacksonPriceMap()
+				} else if (SharePriceMapper.getContinentalTowerPriceMap()
 						.containsKey(chainSize)) {
-					setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize);
+					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getContinentalTowerPriceMap();
+					setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize,priceMapper);
 				} else {
+					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getContinentalTowerPriceMap();
 					setSharePriceAndCashWhenExactSharesNotAvailable(player,
-							label, chainSize);
+							label, chainSize,priceMapper);
 				}
 				player.setShare(label, player.getShare(label) + 1);
 				// player.setCash(player.getCash() - 300);
@@ -196,22 +201,19 @@ public class IAdministrator implements Administrator {
 	}
 
 	private void setSharePriceAndCashWhenExactSharesNotAvailable(Player player,
-			String label, int chainSize) {
+			String label, int chainSize,TreeMap<Integer, Integer> priceMapper) {
 		Share.setSharePrice(label,
-				SharePriceMapper.getWorldwideSacksonPriceMap()
+				priceMapper
 						.lowerEntry(chainSize).getValue());
 		player.setCash(player.getCash()
-				- SharePriceMapper
-						.getWorldwideSacksonPriceMap()
+				- priceMapper
 						.lowerEntry(chainSize).getValue());
 	}
 
-	private void setSharePriceAndCashWhenExactSharesAvailable(Player player, String label, int chainSize) {
-		Share.setSharePrice(label, SharePriceMapper
-				.getWorldwideSacksonPriceMap().get(chainSize));
+	private void setSharePriceAndCashWhenExactSharesAvailable(Player player, String label, int chainSize,TreeMap<Integer, Integer> priceMapper) {
+		Share.setSharePrice(label, priceMapper.get(chainSize));
 		player.setCash(player.getCash()
-				- SharePriceMapper
-						.getWorldwideSacksonPriceMap().get(
+				- priceMapper.get(
 								chainSize));
 	}
 
