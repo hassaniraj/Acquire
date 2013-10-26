@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import com.acquire.board.Tile;
+import com.acquire.player.strategy.PlayerStrategy;
 
 public class Player {
 	private String name;
 	private int cash;
 	private Map <String, Integer> share;
 	private List<Tile> tiles;
+	private PlayerStrategy strategy;
 	
 	public Player() {
 		this.cash = 0;
@@ -66,5 +68,13 @@ public class Player {
 				break;
 			}
 		}
+	}
+	
+	public void setStrategy(PlayerStrategy strategy) {
+		this.strategy = strategy;
+	}
+	
+	public PlayerStrategy getStrategy() {
+		return this.strategy;
 	}
 }
