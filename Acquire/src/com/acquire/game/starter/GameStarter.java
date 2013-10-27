@@ -57,7 +57,7 @@ public class GameStarter {
 //					 System.out.println("\nBefore place:");
 //					for (Tile tile : tiles)
 //						System.out.print(" "
-//								+ tile.getTileLabel(tile.row, tile.column));
+//								+ tile.getTileLabel(tile.getRow(), tile.getRow()));
 					List<Object> response = playerController.playPlace(player,
 							adminController.getHotels());
 					if (response.isEmpty())
