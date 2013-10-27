@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.acquire.board.Board;
 import com.acquire.board.Tile;
 import com.acquire.exception.AcquireException;
 import com.acquire.player.Player;
-import com.acquire.player.Share;
 import com.acquire.player.strategy.LargestAlphaStrategy;
 import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
@@ -26,25 +24,37 @@ public class GameStarter {
 		AdminController adminController = new AdminProxy();
 		PlayerController playerController = new PlayerProxy();
 		Map <String, Integer> results = new HashMap<>();
+		
+		results.put("random", 0);
+		results.put("sequential", 0);
+		results.put("largest-alpha", 0);
+		results.put("smallest-anti", 0);
+		
 		try {
-			for (int i = 0; i < 100; i++) {
+			for (int i = 0; i < 1000; i++) {
 				List<Player> players = new ArrayList<>();
 				Player player1 = new Player();
 				player1.setName("random");
 				player1.setStrategy(new RandomPlayerStrategy());
 				players.add(player1);
+				
 				Player player2 = new Player();
 				player2.setName("sequential");
 				player2.setStrategy(new SequentialPlayerStrategy());
 				players.add(player2);
-				Player player3 = new Player();
-				player3.setName("largest-alpha");
-				player3.setStrategy(new LargestAlphaStrategy());
-				players.add(player3);
+				
 				Player player4 = new Player();
 				player4.setName("smallest-anti");
 				player4.setStrategy(new SmallestAntiStrategy());
 				players.add(player4);
+				
+				Player player3 = new Player();
+				player3.setName("largest-alpha");
+				player3.setStrategy(new LargestAlphaStrategy());
+				players.add(player3);
+				
+				
+				
 				adminController.init(players);
 				
 //				System.out.println(adminController.getWinner());
@@ -53,7 +63,7 @@ public class GameStarter {
 //					 Board.getInstance().getBoard().keySet());
 
 					Player player = adminController.getCurrent();
-					List<Tile> tiles = player.getTile();
+//					List<Tile> tiles = player.getTile();
 //					 System.out.println("\nBefore place:");
 //					for (Tile tile : tiles)
 //						System.out.print(" "
@@ -82,12 +92,12 @@ public class GameStarter {
 					adminController.playerDone();
 
 				}
-				 System.out.println(adminController.getWinner());
-				 
+				System.out.println(adminController.getWinner());
+				results.put(adminController.getWinner(), results.get(adminController.getWinner())+ 1); 
 				 
 //				 if (results.get(adminController.getWinner()) != null)
 //					 current += results.get(adminController.getWinner());
-//				 results.put(adminController.getWinner(), current + 1);
+				 
 			}
 			System.out.println(results);
 		} catch (AcquireException e) {
