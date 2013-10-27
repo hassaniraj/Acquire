@@ -34,8 +34,8 @@ public class Board {
 		for (String row: rows) {
 			for (String column: columns) {
 				Tile tile = new Tile();
-				tile.row = row;
-				tile.column = column;
+				tile.setColumn(column);
+				tile.setRow(row);
 				this.board.put(tile.getTileLabel(row, column), null);
 			}
 		}

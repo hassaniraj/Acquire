@@ -14,5 +14,5 @@ public interface AdminController {
 	public List<String> getHotels();
 	Player getCurrent();
 	boolean checkIfEnd();
-	public Player getWinner();
+	public String getWinner();
 }

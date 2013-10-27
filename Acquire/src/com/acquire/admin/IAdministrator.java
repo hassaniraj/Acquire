@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -53,9 +52,11 @@ public class IAdministrator implements Administrator {
 	}
 
 	@Override
-	public Board startGame(Game game, List<Player> players) {
+	public Board startGame(Game game, List<Player> players) {		
 		Board board = BoardFactory.getBoard();
-		board.getBoard().clear();
+		board.clear();
+		board = BoardFactory.getBoard();		
+		
 		Random rand = new Random();
 		List<String> tiles = new ArrayList<String>();
 		this.initTiles(rand, tiles);
@@ -72,6 +73,8 @@ public class IAdministrator implements Administrator {
 			}
 			player.setCash(6000);
 		}
+		if (game.getGame(board) != null)
+		game.getGame(board).clear();
 		game.setGame(board, players);
 		playerIterator = players.iterator();
 		currentPlayer = playerIterator.next();
@@ -87,30 +90,29 @@ public class IAdministrator implements Administrator {
 	@Override
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
-		String type = acquireActions.inspect(board, tile.row, tile.column);
-		System.out.println(type);
+		String type = acquireActions.inspect(board, tile.getRow(), tile.getColumn());
 		if (type.equals("singleton")) {
-			acquireActions.singleton(board, tile.row, tile.column);
+			acquireActions.singleton(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
 		} else if (type.equals("growing")) {
-			acquireActions.growing(board, tile.row, tile.column);
+			acquireActions.growing(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
 		} else if (type.equals("founding") && !label.equals("") && label != null) {
-			acquireActions.founding(board, tile.row, tile.column, label);
+			acquireActions.founding(board, tile.getRow(), tile.getColumn(), label);
 			player.setShare(label, player.getShare(label) + 1);
 			Share.setShare(label, Share.getShare(label) - 1);
 			player.removeTile(tile);
 			
 		} else if (type.equals("merging")) {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
-					board, tile.row, tile.column);
+					board, tile.getRow(), tile.getColumn());
 			List<String> h = new ArrayList<String>(hotelList.keySet());
-			acquireActions.merging(board, tile.row, tile.column, h.get(0));
+			acquireActions.merging(board,tile.getRow(), tile.getColumn(), h.get(0));
 			player.removeTile(tile);
 		} else {
 			Hotel hotel = new Hotel();
 			hotel.setLabel("singleton");
-			board.getBoard().put(tile.column + tile.row, hotel);
+			board.getBoard().put(tile.getColumn() + tile.getRow(), hotel);
 			player.removeTile(tile);
 		}
 		

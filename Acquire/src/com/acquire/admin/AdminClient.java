@@ -163,8 +163,8 @@ public class AdminClient {
 			Element element = (Element) doc.getElementsByTagName("place").item(
 					0);
 			Tile tile = new Tile();
-			tile.row = element.getAttribute("row");
-			tile.column = element.getAttribute("column");
+			tile.setRow(element.getAttribute("row"));
+			tile.setColumn(element.getAttribute("column"));
 			NodeList playerNodeList = element.getElementsByTagName("player");
 			for (int i = 0; i < playerNodeList.getLength(); i++) {
 				Element node = (Element) playerNodeList.item(i);
@@ -347,8 +347,8 @@ public class AdminClient {
 			List<Tile> tiles = player.getTile();
 			for (Tile tile : tiles) {
 				Element tileElement = doc.createElement("tile");
-				tileElement.setAttribute("column", tile.column);
-				tileElement.setAttribute("row", tile.row);
+				tileElement.setAttribute("column", tile.getColumn());
+				tileElement.setAttribute("row", tile.getRow());
 				rootElement.appendChild(tileElement);
 			}
 			root.appendChild(rootElement);

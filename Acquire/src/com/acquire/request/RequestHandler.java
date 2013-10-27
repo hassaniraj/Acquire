@@ -34,8 +34,11 @@ import com.acquire.factory.BoardFactory;
 import com.acquire.factory.PlayerFactory;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
+import com.acquire.player.strategy.LargestAlphaStrategy;
+import com.acquire.player.strategy.PlayerStrategy;
 import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
+import com.acquire.player.strategy.SmallestAntiStrategy;
 
 public class RequestHandler {
 	public void start(String string) {
@@ -62,11 +65,11 @@ public class RequestHandler {
 			List<Object> place;
 			List<String> hotels;
 			if (s.next().equals("1")) {
-				SequentialPlayerStrategy sequentialPlayerStrategy = new SequentialPlayerStrategy();
+				PlayerStrategy sequentialPlayerStrategy = new LargestAlphaStrategy();
 				place = sequentialPlayerStrategy.playTile(player, hotelList);
 				hotels = sequentialPlayerStrategy.buyShare();
 			} else {
-				RandomPlayerStrategy randomPlayerStrategy = new RandomPlayerStrategy();
+				PlayerStrategy randomPlayerStrategy = new RandomPlayerStrategy();
 				place = randomPlayerStrategy.playTile(player, hotelList);
 				hotels = randomPlayerStrategy.buyShare();
 			}
@@ -248,8 +251,8 @@ public class RequestHandler {
 		if (!place.isEmpty()) {
 			Element placeElement = doc.createElement("place");
 			Tile tile = (Tile) place.get(0);
-			placeElement.setAttribute("row", tile.row);
-			placeElement.setAttribute("column", tile.column);
+			placeElement.setAttribute("row", tile.getRow());
+			placeElement.setAttribute("column", tile.getColumn());
 			if (place.size() > 1)
 				placeElement.setAttribute("hotel", place.get(1).toString());
 			root.appendChild(placeElement);

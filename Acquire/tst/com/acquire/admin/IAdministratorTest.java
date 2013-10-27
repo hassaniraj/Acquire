@@ -133,17 +133,17 @@ public class IAdministratorTest {
 		player.setTile("A", "1");
 		player.setTile("B", "1");
 		Tile tile = new Tile();
-		tile.row = "A";
-		tile.column = "1";
+		tile.setRow("A");
+		tile.setColumn("1");
 
 		AcquireActions acquireActions = Mockito.mock(AcquireActions.class);
 		PowerMockito.mockStatic(AcquireActionsFactory.class);
 		PowerMockito.when(AcquireActionsFactory.getInstance()).thenReturn(
 				acquireActions);
-		Mockito.when(acquireActions.inspect(board, tile.row, tile.column))
+		Mockito.when(acquireActions.inspect(board, tile.getRow(), tile.getColumn()))
 				.thenReturn("singleton");
-		Mockito.when(acquireActions.singleton(board, tile.row,
-		tile.column)).thenReturn(true);
+		Mockito.when(acquireActions.singleton(board, tile.getRow(),
+		tile.getColumn())).thenReturn(true);
 		admin.setTile(board, player, tile, "MockHotel");
 		assertEquals(player.getTile().size(), 1);
 	}
@@ -173,17 +173,17 @@ public class IAdministratorTest {
 		player.setTile("A", "1");
 		player.setTile("B", "1");
 		Tile tile = new Tile();
-		tile.row = "A";
-		tile.column = "1";
+		tile.setRow("A");
+		tile.setColumn("1");
 
 		AcquireActions acquireActions = Mockito.mock(AcquireActions.class);
 		PowerMockito.mockStatic(AcquireActionsFactory.class);
 		PowerMockito.when(AcquireActionsFactory.getInstance()).thenReturn(
 				acquireActions);
-		Mockito.when(acquireActions.inspect(board, tile.row, tile.column))
+		Mockito.when(acquireActions.inspect(board, tile.getRow(), tile.getColumn()))
 				.thenReturn("singleton");
-		Mockito.when(acquireActions.singleton(board, tile.row,
-		tile.column)).thenReturn(true);
+		Mockito.when(acquireActions.singleton(board, tile.getRow(),
+		tile.getColumn())).thenReturn(true);
 		admin.setCurrentPlayer(player);
 		Game game = Mockito.mock(Game.class);
 		PowerMockito.mockStatic(Game.class);

@@ -52,8 +52,8 @@ public class Player {
 	
 	public void setTile(String row, String column) {
 		Tile tile = new Tile();
-		tile.row = row;
-		tile.column = column;
+		tile.setRow(row);
+		tile.setColumn(column);
 		tiles.add(tile);
 	}
 	
@@ -63,7 +63,7 @@ public class Player {
 	
 	public void removeTile(Tile tile) {
 		for (Tile t: tiles) {
-			if (t.getTileLabel(t.row, t.column).equals(tile.getTileLabel(tile.row, tile.column))) {
+			if (t.getTileLabel(t.getRow(), t.getColumn()).equals(tile.getTileLabel(tile.getRow(), tile.getColumn()))) {
 				tiles.remove(tiles.indexOf(t));
 				break;
 			}

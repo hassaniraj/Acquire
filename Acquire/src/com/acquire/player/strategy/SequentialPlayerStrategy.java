@@ -20,48 +20,52 @@ public class SequentialPlayerStrategy implements PlayerStrategy{
 	
 	@Override
 	public List <Object> playTile(Player player, List<String> hotels) {
-		Administrator administrator = IAdministrator.getInstance();
-		Board board = BoardFactory.getBoard();
-		administrator.setCurrentPlayer(player);
+//		Administrator administrator = IAdministrator.getInstance();
+//		Board board = BoardFactory.getBoard();
+//		administrator.setCurrentPlayer(player);
 		List<Tile> tiles = player.getTile();
-		String label = pickHotel(hotels);
-		Tile tile = pickTile(tiles);
+		String label = "";
+		if (hotels.size() > 0)
+			label = pickHotel(hotels);
+		if (!tiles.isEmpty()) {
+			Tile tile = pickTile(tiles);
 		
-		String type = administrator.setTile(board, player, tile, label);
-		if (type.equals("founding") || type.equals("merge")) {
-			return Arrays.asList(tile, label);
+//		String type = administrator.setTile(board, player, tile, label);
+//		if (type.equals("founding") || type.equals("merge")) {
+//			return Arrays.asList(tile, label);
+//		}
+		return new ArrayList<Object>(Arrays.asList(tile, label));
 		}
-		
-		else return new ArrayList<Object> (Arrays.asList(tile));
+		return new ArrayList<Object>();
 	}
 
 	@Override
 	public List <String> buyShare() {
-		Administrator administrator = IAdministrator.getInstance();
-		Board board = BoardFactory.getBoard();
-		Player player = administrator.getCurrentPlayer();
+//		Administrator administrator = IAdministrator.getInstance();
+//		Board board = BoardFactory.getBoard();
+//		Player player = administrator.getCurrentPlayer();
 		List <String> hotels = new ArrayList<>();
 		List <String> labels = new ArrayList<>();
 		labels.addAll(Labels.getLabels());
 		for (int i = 0; i < labels.size(); i++) {
-			if (Chain.getChain(labels.get(i)).isEmpty())
+			if (Chain.getChain(labels.get(i)).isEmpty() || Share.getShare(labels.get(i)) == 0)
 				labels.remove(i);
 		}
 		String hotel = pickHotel(labels);
 		
 		if (!Chain.getChain(hotel).isEmpty()) {
 			hotels.add(hotel);
-			administrator.getHotelShares(board, player, hotel);
+//			administrator.getHotelShares(board, player, hotel);
 		}
 		hotel = pickHotel(labels);
 		if (!Chain.getChain(hotel).isEmpty()) {
 			hotels.add(hotel);
-			administrator.getHotelShares(board, player, hotel);
+//			administrator.getHotelShares(board, player, hotel);
 		}
 		hotel = pickHotel(labels);
 		if (!Chain.getChain(hotel).isEmpty()) {
 			hotels.add(hotel);
-			administrator.getHotelShares(board, player, hotel);
+//			administrator.getHotelShares(board, player, hotel);
 		}
 		return hotels;
 	}
@@ -81,11 +85,11 @@ public class SequentialPlayerStrategy implements PlayerStrategy{
 
 			@Override
 			public int compare(Tile o1, Tile o2) {
-				if (o1.row.equals(o2.row)) {
-					return o1.column.compareTo(o2.column);
+				if (o1.getRow().equals(o2.getRow())) {
+					return o1.getColumn().compareTo(o2.getColumn());
 				}
 				else
-				return o1.row.compareTo(o2.row);
+				return o1.getRow().compareTo(o2.getRow());
 			}
 		});
 		
