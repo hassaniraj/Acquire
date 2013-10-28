@@ -282,7 +282,6 @@ public class IAdministrator implements Administrator {
 			if (Chain.getChain(chain).isEmpty()) chainLabels.remove(chain);
 		}
 		for (String chainName: chainLabels.keySet()) {
-			System.out.println(Chain.getChain(chainName).size());
 			if (Chain.getChain(chainName).size() >= 41) {
 				return true;
 			}

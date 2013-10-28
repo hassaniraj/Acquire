@@ -33,7 +33,7 @@ public class GameController {
 		results.put("smallest-anti", 0);
 
 		try {
-//			for (int i = 0; i < 1000; i++) {
+			for (int i = 0; i < 100; i++) {
 				List<Player> players = new ArrayList<>();
 				Player player1 = new Player();
 				player1.setName("random");
@@ -64,10 +64,10 @@ public class GameController {
 
 					Player player = adminController.getCurrent();
 					 List<Tile> tiles = player.getTile();
-					 System.out.println("\nBefore place:");
-					 for (Tile tile : tiles)
-					 System.out.print(" "
-					 + tile.getTileLabel(tile.getRow(), tile.getColumn()));
+//					 System.out.println("\nBefore place:");
+//					 for (Tile tile : tiles)
+//					 System.out.print(" "
+//					 + tile.getTileLabel(tile.getRow(), tile.getColumn()));
 					List<Object> response = playerController.playPlace(player,
 							adminController.getHotels());
 					if (response.isEmpty())
@@ -84,7 +84,7 @@ public class GameController {
 					// for (Tile tile : tiles)
 					// System.out.print(" "
 					// + tile.getTileLabel(tile.row, tile.column));
-					System.out.println(Board.getInstance().getHotelTiles());
+//					System.out.println(Board.getInstance().getHotelTiles());
 					List<String> hotels = playerController.playBuy(player);
 					for (String hotel : hotels) {
 						// System.out.println("\nBuying .." + hotel +
@@ -95,19 +95,18 @@ public class GameController {
 					adminController.playerDone();
 
 				}
-				System.out.println(adminController.getWinner());
+//				System.out.println(adminController.getWinner());
 				results.put(adminController.getWinner(),
 						results.get(adminController.getWinner()) + 1);
 
 				// if (results.get(adminController.getWinner()) != null)
 				// current += results.get(adminController.getWinner());
 
-//			}
+			}
 			System.out.println(results);
+		
 		} catch (AcquireException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
-
 	}
 }
