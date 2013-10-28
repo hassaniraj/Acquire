@@ -19,7 +19,7 @@ import com.acquire.proxy.AdminProxy;
 import com.acquire.proxy.PlayerController;
 import com.acquire.proxy.PlayerProxy;
 
-public class GameStarter {
+public class GameController {
 
 	public static void main(String args[]) {
 
