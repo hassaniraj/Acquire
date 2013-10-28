@@ -13,7 +13,6 @@ import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Hotel;
-import com.acquire.board.SharePriceMapper;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
 
@@ -57,6 +56,15 @@ public class IAcquireActions implements AcquireActions {
 		return null;
 	}
 
+	/**
+	 * Method to get neighbors for a tile
+	 * @param r
+	 * @param prevCol
+	 * @param nextCol
+	 * @param row
+	 * @param board
+	 * @return List<String> consisting of the neighboring tiles
+	 */
 	private List<String> checkNeighbor(int r, String prevCol, String nextCol,
 			String row, Board board) {
 		List<String> positions = new ArrayList<>();
@@ -209,6 +217,10 @@ public class IAcquireActions implements AcquireActions {
 		return chains;
 	}
 
+	/**
+	 * Method to check if the chains are equal
+	 * @return true if of equal size
+	 */
 	public boolean checkIfEqual() {
 		int max = 0;
 		for (String hotel : hotels) {
@@ -225,6 +237,10 @@ public class IAcquireActions implements AcquireActions {
 		return true;
 	}
 
+	/**
+	 * Method to check if the impossible condition occurs for the chain size > 41
+	 * @return true if chain size is greater than 41
+	 */
 	public boolean impossible() {
 		int max = 0;
 		for (String hotel : hotels) {
@@ -242,13 +258,22 @@ public class IAcquireActions implements AcquireActions {
 		return false;
 	}
 	
-	
+	/**
+	 * Method to set the bonus of the player
+	 * @param acquired
+	 */
 	public void setBonus(Set<String> acquired) {
 		List<Player> players = Game.getInstance().getGame(Board.getInstance());
 		List<String> hotels = new ArrayList<>(acquired);
 		hotels.remove(0);
 		setPlayersContainingShares(hotels, players);
 	}
+	
+	/**
+	 * Method to set the players containing the cash in a map
+	 * @param hotels
+	 * @param players
+	 */
 
 	public void setPlayersContainingShares(List<String> hotels,
 			List<Player> players) {
@@ -270,6 +295,11 @@ public class IAcquireActions implements AcquireActions {
 		}
 	}
 
+	/**
+	 * Method to set cash for the player for the bonus
+	 * @param playerShareMap
+	 * @param hotel
+	 */
 	public void setCash(TreeMap<Integer, List<Player>> playerShareMap,
 			String hotel) {
 		boolean isFirstPlayer = true;
@@ -315,6 +345,10 @@ public class IAcquireActions implements AcquireActions {
 		}
 	}
 
+	/**
+	 * Method to sell the shares for the player after getting the bonus
+	 * @param acquired
+	 */
 	public void sell(Set<String> acquired) {
 		List<String> hotels = new ArrayList<>(acquired);
 		hotels.remove(0);
