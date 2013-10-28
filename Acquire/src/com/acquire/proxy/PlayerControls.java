@@ -15,4 +15,9 @@ public class PlayerControls implements PlayerController {
 	public List<String> playBuy(Player player) throws AcquireException {
 		return player.getStrategy().buyShare();
 	}
+
+	@Override
+	public boolean askEndGame() {
+		return true;
+	}
 }

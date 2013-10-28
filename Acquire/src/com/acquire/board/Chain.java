@@ -21,6 +21,10 @@ public class Chain {
 		return chains.get(name);
 	}
 	
+	public static synchronized Map<String, List<String>> getChain() {
+		return chains;
+	}
+	
 	public static synchronized int getChainSize() {
 		return chains.size();
 	}

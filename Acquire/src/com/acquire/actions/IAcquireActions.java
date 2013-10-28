@@ -1,16 +1,21 @@
 package com.acquire.actions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.acquire.board.Board;
 import com.acquire.board.Chain;
+import com.acquire.board.Game;
 import com.acquire.board.Hotel;
-import com.acquire.board.Tile;
+import com.acquire.board.SharePriceMapper;
+import com.acquire.player.Player;
+import com.acquire.player.Share;
 
 public class IAcquireActions implements AcquireActions {
 
@@ -135,7 +140,7 @@ public class IAcquireActions implements AcquireActions {
 				maxLabel = label;
 			} else if (!impossible()) {
 				for (String hotel : hotels) {
-					if (!hotel.equals("singleton")) {
+					if (!hotel.equalsIgnoreCase("singleton")) {
 					List<String> chain = Chain.getChain(hotel);
 					if (max < chain.size()) {
 						max = chain.size();
@@ -153,6 +158,7 @@ public class IAcquireActions implements AcquireActions {
 			acquired.add(maxLabel);
 			for (String hotelName : hotels) {
 				if (!hotelName.equals(maxLabel)) {
+					if (!hotelName.equalsIgnoreCase("singleton")){
 					acquired.add(hotelName);
 					List<String> chain = Chain.getChain(hotelName);
 					if (chain != null) {
@@ -165,7 +171,7 @@ public class IAcquireActions implements AcquireActions {
 						}
 						Chain.getChain(hotelName).clear();
 					}
-				}
+				}}
 
 			}
 			int r = Integer.parseInt(column);
@@ -181,6 +187,10 @@ public class IAcquireActions implements AcquireActions {
 					board.getBoard().put(neighbour, hotel);
 					Chain.setChain(maxLabel, neighbour);
 				}
+			}
+			if(acquired.size()>1){
+				setBonus(acquired);
+				sell(acquired);
 			}
 			return acquired;
 		}
@@ -231,4 +241,93 @@ public class IAcquireActions implements AcquireActions {
 		}
 		return false;
 	}
+	
+	
+	public void setBonus(Set<String> acquired) {
+		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		List<String> hotels = new ArrayList<>(acquired);
+		hotels.remove(0);
+		setPlayersContainingShares(hotels, players);
+	}
+
+	public void setPlayersContainingShares(List<String> hotels,
+			List<Player> players) {
+		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(Collections.reverseOrder());
+		for (String hotel : hotels) {
+			for (Player player : players) {
+				if (player.getShares().containsKey(hotel)) {
+					int playerShares = player.getShare(hotel);
+					if (playerShareMap.containsKey(playerShares)) {
+						playerShareMap.get(playerShares).add(player);
+					} else {
+						List<Player> playerList = new ArrayList<>();
+						playerList.add(player);
+						playerShareMap.put(playerShares, playerList);
+					}
+				}
+			}
+			setCash(playerShareMap, hotel);
+		}
+	}
+
+	public void setCash(TreeMap<Integer, List<Player>> playerShareMap,
+			String hotel) {
+		boolean isFirstPlayer = true;
+		for (Map.Entry<Integer, List<Player>> entry : playerShareMap.entrySet()) {
+			if (entry.getValue().size() > 1) {
+				if (isFirstPlayer) {
+					int price = Share.getSharePrice(hotel);
+					price = price * 15;
+					isFirstPlayer = false;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				} else {
+					int price = Share.getSharePrice(hotel);
+					price = price * 5;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				}
+
+			} else if (entry.getValue().size() == 1) {
+				if (isFirstPlayer) {
+					int price = Share.getSharePrice(hotel);
+					price = price * 10;
+					isFirstPlayer = false;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash() + price);
+					}
+				} else {
+					int price = Share.getSharePrice(hotel);
+					price = price * 5;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	public void sell(Set<String> acquired) {
+		List<String> hotels = new ArrayList<>(acquired);
+		hotels.remove(0);
+		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		for (String hotel : hotels) {
+			for (Player player : players) {
+				if(player.getShares().containsKey(hotel)){
+					player.setCash(player.getCash()+(player.getShare(hotel)*Share.getSharePrice(hotel)));
+					player.setShare(hotel, 0);
+				}
+			}
+
+		}
+	}
+	
 }

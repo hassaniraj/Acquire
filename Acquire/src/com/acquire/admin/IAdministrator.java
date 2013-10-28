@@ -1,11 +1,15 @@
 package com.acquire.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.TreeMap;
 
 import com.acquire.actions.AcquireActions;
@@ -273,10 +277,24 @@ public class IAdministrator implements Administrator {
 	
 	@Override
 	public boolean isEnd() {
-		Set<String> chainLabels = Chain.getChainLabel();
-		for (String chainName: chainLabels) {
-			if (Chain.getChain(chainName).size() >= 41) return true;
+		Map<String, List<String>> chainLabels = new HashMap<>(Chain.getChain());
+		for (String chain: Chain.getChain().keySet()) {
+			if (Chain.getChain(chain).isEmpty()) chainLabels.remove(chain);
 		}
+		for (String chainName: chainLabels.keySet()) {
+			System.out.println(Chain.getChain(chainName).size());
+			if (Chain.getChain(chainName).size() >= 41) {
+				return true;
+			}
+		}
+		
+		Map <Integer, String> chainLabelsSize = new TreeMap<>();
+		for (String chainName: chainLabels.keySet()) {
+			chainLabelsSize.put(chainLabels.get(chainName).size(), chainName);
+		}
+		if (!chainLabelsSize.isEmpty())
+		if (chainLabelsSize.keySet().iterator().next() > 10)
+			return true;
 		return false;
 	}
 

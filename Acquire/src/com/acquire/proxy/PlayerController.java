@@ -8,4 +8,5 @@ import com.acquire.player.Player;
 public interface PlayerController {
 	public List<String> playBuy(Player player) throws AcquireException;
 	public List<Object> playPlace(Player player, List<String> hotels);
+	public boolean askEndGame();
 }

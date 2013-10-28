@@ -21,4 +21,9 @@ public class PlayerProxy implements PlayerController {
 	public List<String> playBuy(Player player) throws AcquireException {
 		return playerController.playBuy(player);
 	}
+
+	@Override
+	public boolean askEndGame() {
+		return playerController.askEndGame();
+	}
 }
