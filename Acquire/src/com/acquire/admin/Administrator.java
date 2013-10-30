@@ -19,22 +19,22 @@ public interface Administrator {
 	Map<String, Hotel> getOccupiedTiles();
 	
 	//Get all empty tiles on board
-	List<String> getEmptyTiles();
+//	List<String> getEmptyTiles();
 	
 	//Get random tiles from empty tiles
 	String pickTiles();
 	
 	//Get money from bank and distribute to players
-	double distributeMoney();
+//	double distributeMoney();
 	
 	//Get player info
 	List<Player> getPlayers(Game game, Board board);
 	
 	//get counter of tiles owned by player for a hotel
-	int getHotelCounter(String hotel, String player);
+//	int getHotelCounter(String hotel, String player);
 	
 	//set counter of tiles owned by pplayer for a hotel
-	int setHotelCounter(String hotel, String player);
+//	int setHotelCounter(String hotel, String player);
 	
 	//get list of hotels and remaining stock
 	void getHotelShares(Board board, Player player, String label);
@@ -46,10 +46,10 @@ public interface Administrator {
 	int getStockPrice (String hotel);
 	
 	//get bonus for each player for hotel
-	double getBonus(String player, String hotel);
+	//double getBonus(String player, String hotel);
 	
 	//compute final score of each player
-	void getFinalScore(List<String> players, List <String> hotels);
+	//void getFinalScore(List<String> players, List <String> hotels);
 
 	String setTile(Board board, Player player, Tile tile, String label);
 	

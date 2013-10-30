@@ -13,22 +13,22 @@ import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Hotel;
+import com.acquire.board.Labels;
+import com.acquire.factory.BoardFactory;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
 
 public class IAcquireActions implements AcquireActions {
 
 	private List<String> hotels;
+	
+	private int SAFE_CHAIN_SIZE = 11;
 
 	@Override
 	public String inspect(Board board, String row, String column) {
-		int r = Integer.parseInt(column);
-		int charValue = row.charAt(0);
-		String nextCol = String.valueOf((char) (charValue + 1));
-		String prevCol = String.valueOf((char) (charValue - 1));
 		hotels = new ArrayList<>();
-		List<String> neighbors = checkNeighbor(r, prevCol, nextCol, row, board);
 
+		List<String> neighbors = checkNeighbor(row, column, board);
 		for (String n : neighbors) {
 			if (!hotels.contains(board.getBoard().get(n).getLabel()))
 				hotels.add(board.getBoard().get(n).getLabel());
@@ -58,6 +58,7 @@ public class IAcquireActions implements AcquireActions {
 
 	/**
 	 * Method to get neighbors for a tile
+	 * 
 	 * @param r
 	 * @param prevCol
 	 * @param nextCol
@@ -65,22 +66,55 @@ public class IAcquireActions implements AcquireActions {
 	 * @param board
 	 * @return List<String> consisting of the neighboring tiles
 	 */
-	private List<String> checkNeighbor(int r, String prevCol, String nextCol,
-			String row, Board board) {
+	private List<String> checkNeighbor(String row, String column, Board board) {
 		List<String> positions = new ArrayList<>();
-		if (board.getBoard().get(r + nextCol) != null) {
-			positions.add(r + nextCol);
+		List<String> position = new ArrayList<>();
+		int rowIndex = BoardFactory.getBoard().getRows().indexOf(row);
+		int columnIndex = BoardFactory.getBoard().getColumns().indexOf(column);
+		if (rowIndex - 1 > 0) {
+			position.add(column + BoardFactory.getBoard().getRows()
+					.get(rowIndex - 1));
+			if (board.getBoard().get(column +
+					BoardFactory.getBoard().getRows().get(rowIndex - 1)) != null) {
+				positions.add(column + BoardFactory.getBoard().getRows()
+						.get(rowIndex - 1));
+			}
 		}
-		if (board.getBoard().get(r + prevCol) != null) {
-			positions.add(r + prevCol);
+		if (rowIndex + 1 < BoardFactory.getBoard().getRows().size()) {
+			position.add(column + BoardFactory.getBoard().getRows()
+					.get(rowIndex + 1));
+			if (board.getBoard().get(column +
+					BoardFactory.getBoard().getRows().get(rowIndex + 1)) != null) {
+				positions.add(column + BoardFactory.getBoard().getRows()
+						.get(rowIndex + 1));
+			}
 		}
-		if (board.getBoard().get((r + 1) + row) != null) {
-			positions.add((r + 1) + row);
+		if (columnIndex - 1 > 0) {
+			position.add(BoardFactory.getBoard().getColumns()
+					.get(columnIndex - 1)
+					+ row);
+			if (board.getBoard().get(
+					BoardFactory.getBoard().getColumns().get(columnIndex - 1)
+							+ row) != null) {
+				positions.add(BoardFactory.getBoard().getColumns()
+						.get(columnIndex - 1)
+						+ row);
+			}
 		}
-		if (board.getBoard().get((r - 1) + row) != null) {
-			positions.add((r - 1) + row);
+		if (columnIndex + 1 < BoardFactory.getBoard().getColumns().size()) {
+			position.add(BoardFactory.getBoard().getColumns()
+					.get(columnIndex + 1)
+					+ row);
+			if (board.getBoard().get(
+					BoardFactory.getBoard().getColumns().get(columnIndex + 1)
+							+ row) != null) {
+				positions.add(BoardFactory.getBoard().getColumns()
+						.get(columnIndex + 1)
+						+ row);
+			}
 		}
-		return positions;
+
+		return positions; 
 	}
 
 	@Override
@@ -114,11 +148,7 @@ public class IAcquireActions implements AcquireActions {
 	@Override
 	public boolean founding(Board board, String row, String column, String label) {
 		String type = inspect(board, row, column);
-		int r = Integer.parseInt(column);
-		int charValue = row.charAt(0);
-		String nextCol = String.valueOf((char) (charValue + 1));
-		String prevCol = String.valueOf((char) (charValue - 1));
-		List<String> neighbors = checkNeighbor(r, prevCol, nextCol, row, board);
+		List<String> neighbors = checkNeighbor(row, column, board);
 		if (type.equalsIgnoreCase("founding")) {
 			Hotel hotel = new Hotel();
 			hotel.setLabel(label);
@@ -149,11 +179,11 @@ public class IAcquireActions implements AcquireActions {
 			} else if (!impossible()) {
 				for (String hotel : hotels) {
 					if (!hotel.equalsIgnoreCase("singleton")) {
-					List<String> chain = Chain.getChain(hotel);
-					if (max < chain.size()) {
-						max = chain.size();
-						maxLabel = hotel;
-					}
+						List<String> chain = Chain.getChain(hotel);
+						if (max < chain.size()) {
+							max = chain.size();
+							maxLabel = hotel;
+						}
 					}
 				}
 			} else
@@ -166,28 +196,24 @@ public class IAcquireActions implements AcquireActions {
 			acquired.add(maxLabel);
 			for (String hotelName : hotels) {
 				if (!hotelName.equals(maxLabel)) {
-					if (!hotelName.equalsIgnoreCase("singleton")){
-					acquired.add(hotelName);
-					List<String> chain = Chain.getChain(hotelName);
-					if (chain != null) {
-						for (String tile : chain) {
-							Hotel h = new Hotel();
-							h.setLabel(maxLabel);
-							board.getBoard().remove(tile);
-							board.getBoard().put(tile, h);
-							Chain.setChain(maxLabel, tile);
+					if (!hotelName.equalsIgnoreCase("singleton")) {
+						acquired.add(hotelName);
+						List<String> chain = Chain.getChain(hotelName);
+						if (chain != null) {
+							for (String tile : chain) {
+								Hotel h = new Hotel();
+								h.setLabel(maxLabel);
+								board.getBoard().remove(tile);
+								board.getBoard().put(tile, h);
+								Chain.setChain(maxLabel, tile);
+							}
+							Chain.getChain(hotelName).clear();
 						}
-						Chain.getChain(hotelName).clear();
 					}
-				}}
+				}
 
 			}
-			int r = Integer.parseInt(column);
-			int charValue = row.charAt(0);
-			String nextCol = String.valueOf((char) (charValue + 1));
-			String prevCol = String.valueOf((char) (charValue - 1));
-			List<String> neighbours = checkNeighbor(r, prevCol, nextCol, row,
-					board);
+			List<String> neighbours = checkNeighbor(row, column, board);
 
 			for (String neighbour : neighbours) {
 				if (board.getBoard().get(neighbour).getLabel()
@@ -196,7 +222,7 @@ public class IAcquireActions implements AcquireActions {
 					Chain.setChain(maxLabel, neighbour);
 				}
 			}
-			if(acquired.size()>1){
+			if (acquired.size() > 1) {
 				setBonus(acquired);
 				sell(acquired);
 			}
@@ -219,6 +245,7 @@ public class IAcquireActions implements AcquireActions {
 
 	/**
 	 * Method to check if the chains are equal
+	 * 
 	 * @return true if of equal size
 	 */
 	public boolean checkIfEqual() {
@@ -238,7 +265,9 @@ public class IAcquireActions implements AcquireActions {
 	}
 
 	/**
-	 * Method to check if the impossible condition occurs for the chain size > 41
+	 * Method to check if the impossible condition occurs for the chain size >
+	 * 41
+	 * 
 	 * @return true if chain size is greater than 41
 	 */
 	public boolean impossible() {
@@ -249,7 +278,7 @@ public class IAcquireActions implements AcquireActions {
 				if (max != chain.size() && max != 0) {
 					max = chain.size();
 				} else {
-					if (max >= 11 && max == chain.size())
+					if (max >= SAFE_CHAIN_SIZE && max == chain.size())
 						return true;
 					max = chain.size();
 				}
@@ -257,9 +286,10 @@ public class IAcquireActions implements AcquireActions {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Method to set the bonus of the player
+	 * 
 	 * @param acquired
 	 */
 	public void setBonus(Set<String> acquired) {
@@ -268,18 +298,23 @@ public class IAcquireActions implements AcquireActions {
 		hotels.remove(0);
 		setPlayersContainingShares(hotels, players);
 	}
-	
+
 	/**
 	 * Method to set the players containing the cash in a map
+	 * 
 	 * @param hotels
 	 * @param players
 	 */
 
 	public void setPlayersContainingShares(List<String> hotels,
 			List<Player> players) {
-		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(Collections.reverseOrder());
+		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(
+				Collections.reverseOrder());
 		for (String hotel : hotels) {
 			for (Player player : players) {
+				System.out.println(player.getCash());
+				System.out.println(player.getName());
+				System.out.println(player.getShares());
 				if (player.getShares().containsKey(hotel)) {
 					int playerShares = player.getShare(hotel);
 					if (playerShareMap.containsKey(playerShares)) {
@@ -297,6 +332,7 @@ public class IAcquireActions implements AcquireActions {
 
 	/**
 	 * Method to set cash for the player for the bonus
+	 * 
 	 * @param playerShareMap
 	 * @param hotel
 	 */
@@ -347,6 +383,7 @@ public class IAcquireActions implements AcquireActions {
 
 	/**
 	 * Method to sell the shares for the player after getting the bonus
+	 * 
 	 * @param acquired
 	 */
 	public void sell(Set<String> acquired) {
@@ -355,13 +392,15 @@ public class IAcquireActions implements AcquireActions {
 		List<Player> players = Game.getInstance().getGame(Board.getInstance());
 		for (String hotel : hotels) {
 			for (Player player : players) {
-				if(player.getShares().containsKey(hotel)){
-					player.setCash(player.getCash()+(player.getShare(hotel)*Share.getSharePrice(hotel)));
+				if (player.getShares().containsKey(hotel)) {
+					player.setCash(player.getCash()
+							+ (player.getShare(hotel) * Share
+									.getSharePrice(hotel)));
 					player.setShare(hotel, 0);
 				}
 			}
 
 		}
 	}
-	
+
 }

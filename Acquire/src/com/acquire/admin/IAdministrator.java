@@ -1,12 +1,8 @@
 package com.acquire.admin;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -31,6 +27,8 @@ public class IAdministrator implements Administrator {
 	private Iterator<Player> playerIterator;
 	private Player currentPlayer;
 	private static Administrator administrator;
+	private int MAX_CHAIN_SIZE = 41;
+	private int SAFE_CHAIN_SIZE = 11;
 
 	@Override
 	public void initTiles(Random random, List<String> tiles) {
@@ -87,7 +85,6 @@ public class IAdministrator implements Administrator {
 
 	@Override
 	public Map<String, Hotel> getOccupiedTiles() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -123,11 +120,11 @@ public class IAdministrator implements Administrator {
 		return type;
 	}
 
-	@Override
-	public List<String> getEmptyTiles() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//	@Override
+//	public List<String> getEmptyTiles() {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
 	@Override
 	public String pickTiles() {
@@ -140,28 +137,26 @@ public class IAdministrator implements Administrator {
 		return null;
 	}
 
-	@Override
-	public double distributeMoney() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+//	@Override
+//	public double distributeMoney() {
+//		return 0;
+//	}
 
 	@Override
 	public List<Player> getPlayers(Game game, Board board) {
 		return game.getGame(board);
 	}
 
-	@Override
-	public int getHotelCounter(String hotel, String player) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int setHotelCounter(String hotel, String player) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+//	@Override
+//	public int getHotelCounter(String hotel, String player) {
+//		return 0;
+//	}
+//
+//	@Override
+//	public int setHotelCounter(String hotel, String player) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
 
 	//Get the hotel shares and set the new share price
 	@Override
@@ -192,15 +187,18 @@ public class IAdministrator implements Administrator {
 						setSharePriceAndCashWhenExactSharesNotAvailable(player,
 								label, chainSize,priceMapper);
 					}
-				} else if (SharePriceMapper.getContinentalTowerPriceMap()
-						.containsKey(chainSize)) {
+				} else if (label.equalsIgnoreCase("Continental")
+							|| label.equalsIgnoreCase("Tower")){
 					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getContinentalTowerPriceMap();
-					setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize,priceMapper);
-				} else {
-					TreeMap<Integer, Integer> priceMapper=SharePriceMapper.getContinentalTowerPriceMap();
-					setSharePriceAndCashWhenExactSharesNotAvailable(player,
-							label, chainSize,priceMapper);
+					if (SharePriceMapper.getContinentalTowerPriceMap()
+							.containsKey(chainSize)) {
+						setSharePriceAndCashWhenExactSharesAvailable(player, label, chainSize,priceMapper);
+					} else {
+						setSharePriceAndCashWhenExactSharesNotAvailable(player,
+								label, chainSize,priceMapper);
+					}
 				}
+					
 				player.setShare(label, player.getShare(label) + 1);
 				// player.setCash(player.getCash() - 300);
 			}
@@ -235,17 +233,17 @@ public class IAdministrator implements Administrator {
 		return Share.getSharePrice(hotel);
 	}
 
-	@Override
-	public double getBonus(String player, String hotel) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void getFinalScore(List<String> players, List<String> hotels) {
-		// TODO Auto-generated method stub
-
-	}
+//	@Override
+//	public double getBonus(String player, String hotel) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+//
+//	@Override
+//	public void getFinalScore(List<String> players, List<String> hotels) {
+//		// TODO Auto-generated method stub
+//
+//	}
 
 	@Override
 	public Player getCurrentPlayer() {
@@ -282,7 +280,7 @@ public class IAdministrator implements Administrator {
 			if (Chain.getChain(chain).isEmpty()) chainLabels.remove(chain);
 		}
 		for (String chainName: chainLabels.keySet()) {
-			if (Chain.getChain(chainName).size() >= 41) {
+			if (Chain.getChain(chainName).size() >= MAX_CHAIN_SIZE) {
 				return true;
 			}
 		}
@@ -292,7 +290,7 @@ public class IAdministrator implements Administrator {
 			chainLabelsSize.put(chainLabels.get(chainName).size(), chainName);
 		}
 		if (!chainLabelsSize.isEmpty())
-		if (chainLabelsSize.keySet().iterator().next() > 10)
+		if (chainLabelsSize.keySet().iterator().next() >= SAFE_CHAIN_SIZE)
 			return true;
 		return false;
 	}

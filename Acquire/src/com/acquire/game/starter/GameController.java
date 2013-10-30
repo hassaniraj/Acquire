@@ -7,8 +7,10 @@ import java.util.Map;
 
 import com.acquire.board.Board;
 import com.acquire.board.Chain;
+import com.acquire.board.Game;
 import com.acquire.board.Tile;
 import com.acquire.exception.AcquireException;
+import com.acquire.factory.BoardFactory;
 import com.acquire.player.Player;
 import com.acquire.player.strategy.LargestAlphaStrategy;
 import com.acquire.player.strategy.RandomPlayerStrategy;
@@ -56,42 +58,46 @@ public class GameController {
 				players.add(player3);
 
 				adminController.init(players);
-
+				System.out.println("Starting game ... ");
 				// System.out.println(adminController.getWinner());
 				while (true) {
-					// System.out.println("\n" +
-					// Board.getInstance().getBoard().keySet());
-
 					Player player = adminController.getCurrent();
-					 List<Tile> tiles = player.getTile();
+					System.out.println("\nCurrent Player: " + player.getName());
+//					 List<Tile> tiles = player.getTile();
 //					 System.out.println("\nBefore place:");
 //					 for (Tile tile : tiles)
 //					 System.out.print(" "
 //					 + tile.getTileLabel(tile.getRow(), tile.getColumn()));
+					System.out.println("Asking player " + player.getName() + " to make move...");
 					List<Object> response = playerController.playPlace(player,
 							adminController.getHotels());
 					if (response.isEmpty())
 						break;
 					if (adminController.checkIfEnd()) {
-						if (playerController.askEndGame()) break; 
+						if (playerController.askEndGame()) break;
 					}
 					Tile t = (Tile) response.get(0);
 					// System.out.println("\nTile : " + t.getTileLabel(t.row,
 					// t.column));
+					
 					adminController.playerPlaceMove((Tile) response.get(0),
 							response.get(1).toString());
+					Tile tile = (Tile) response.get(0);
+					System.out.println("Player " + player.getName() + " placed " + tile.getColumn() + tile.getRow());
 					// System.out.println("\nAfter place:");
 					// for (Tile tile : tiles)
 					// System.out.print(" "
 					// + tile.getTileLabel(tile.row, tile.column));
 //					System.out.println(Board.getInstance().getHotelTiles());
 					List<String> hotels = playerController.playBuy(player);
+					
 					for (String hotel : hotels) {
 						// System.out.println("\nBuying .." + hotel +
 						// " Share : " + Share.getSharePrice(hotel));
 
 						adminController.playerBuyMove(hotel);
 					}
+					System.out.println("Player " + player.getName() + " bought " + hotels);
 					adminController.playerDone();
 
 				}
@@ -103,6 +109,8 @@ public class GameController {
 				// current += results.get(adminController.getWinner());
 
 			}
+			System.out.println("Game ended! ");
+			
 			System.out.println(results);
 		
 		} catch (AcquireException e) {
