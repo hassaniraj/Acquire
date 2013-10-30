@@ -308,6 +308,7 @@ public class IAdministrator implements Administrator {
 			int sharePrice = Share.getSharePrice(label);
 			worthOfAPlayer=(sharePrice*numberOfShares)+cash;
 		}
+		worthOfAPlayer = cash;
 		return worthOfAPlayer;
 	}
 

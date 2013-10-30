@@ -82,7 +82,7 @@ public class GameController {
 
 				}
 				
-				System.out.println(adminController.getWinner());
+				//System.out.println(adminController.getWinner());
 				List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
 				for (Player p: playersFinalScore) 
 					System.out.println(p.getName()+ " : " + p.getCash());
