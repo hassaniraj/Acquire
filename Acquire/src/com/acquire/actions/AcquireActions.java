@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.acquire.board.Board;
 import com.acquire.board.Hotel;
+import com.acquire.player.Player;
 
 public interface AcquireActions {
 	String inspect (Board board, String row, String column);
@@ -14,4 +15,5 @@ public interface AcquireActions {
 	boolean founding (Board board, String row, String column, String label);
 	Set <String> merging (Board board, String row, String column, String label);
 	Map<String, List<String>> getLabel(Board board, String row, String column);
+	void setPlayersContainingShares(List<String> hotels, List<Player> players);
 }

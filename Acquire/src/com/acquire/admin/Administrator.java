@@ -66,4 +66,6 @@ public interface Administrator {
 	boolean isEnd();
 	
 	int getWorth(Player player);
+
+	double getBonus(List<Player> player, List<String> hotel);
 }

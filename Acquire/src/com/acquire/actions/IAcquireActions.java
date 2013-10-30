@@ -306,15 +306,13 @@ public class IAcquireActions implements AcquireActions {
 	 * @param players
 	 */
 
+	@Override
 	public void setPlayersContainingShares(List<String> hotels,
 			List<Player> players) {
 		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(
 				Collections.reverseOrder());
 		for (String hotel : hotels) {
 			for (Player player : players) {
-				System.out.println(player.getCash());
-				System.out.println(player.getName());
-				System.out.println(player.getShares());
 				if (player.getShares().containsKey(hotel)) {
 					int playerShares = player.getShare(hotel);
 					if (playerShareMap.containsKey(playerShares)) {

@@ -233,11 +233,12 @@ public class IAdministrator implements Administrator {
 		return Share.getSharePrice(hotel);
 	}
 
-//	@Override
-//	public double getBonus(String player, String hotel) {
-//		// TODO Auto-generated method stub
-//		return 0;
-//	}
+	@Override
+	public double getBonus(List<Player> player, List<String> hotel) {
+		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
+		acquireActions.setPlayersContainingShares(hotel, player);
+		return 0;
+	}
 //
 //	@Override
 //	public void getFinalScore(List<String> players, List<String> hotels) {

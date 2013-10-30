@@ -64,6 +64,10 @@ public class AdminControls implements AdminController {
 		List<Player> players = Game.getInstance().getGame(Board.getInstance());
 		String winner = "";
 		int max = 0;
+		List<String> hotels = new ArrayList<>(Labels.getLabels());
+		
+		admin.getBonus(players, hotels);
+		
 		for (Player player : players) {
 			int finalWorth = admin.getWorth(player);
 			if (max < finalWorth) {

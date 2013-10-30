@@ -28,14 +28,15 @@ public class GameController {
 		AdminController adminController = new AdminProxy();
 		PlayerController playerController = new PlayerProxy();
 		Map<String, Integer> results = new HashMap<>();
-
+		
 		results.put("random", 0);
 		results.put("sequential", 0);
 		results.put("largest-alpha", 0);
 		results.put("smallest-anti", 0);
-
+		
 		try {
-			for (int i = 0; i < 100; i++) {
+			for (int k = 0; k < 100; k++) {
+				System.out.println("\nGame " + k);
 				List<Player> players = new ArrayList<>();
 				Player player1 = new Player();
 				player1.setName("random");
@@ -58,17 +59,8 @@ public class GameController {
 				players.add(player3);
 
 				adminController.init(players);
-				System.out.println("Starting game ... ");
-				// System.out.println(adminController.getWinner());
 				while (true) {
 					Player player = adminController.getCurrent();
-					System.out.println("\nCurrent Player: " + player.getName());
-//					 List<Tile> tiles = player.getTile();
-//					 System.out.println("\nBefore place:");
-//					 for (Tile tile : tiles)
-//					 System.out.print(" "
-//					 + tile.getTileLabel(tile.getRow(), tile.getColumn()));
-					System.out.println("Asking player " + player.getName() + " to make move...");
 					List<Object> response = playerController.playPlace(player,
 							adminController.getHotels());
 					if (response.isEmpty())
@@ -77,41 +69,35 @@ public class GameController {
 						if (playerController.askEndGame()) break;
 					}
 					Tile t = (Tile) response.get(0);
-					// System.out.println("\nTile : " + t.getTileLabel(t.row,
-					// t.column));
-					
 					adminController.playerPlaceMove((Tile) response.get(0),
 							response.get(1).toString());
 					Tile tile = (Tile) response.get(0);
-					System.out.println("Player " + player.getName() + " placed " + tile.getColumn() + tile.getRow());
-					// System.out.println("\nAfter place:");
-					// for (Tile tile : tiles)
-					// System.out.print(" "
-					// + tile.getTileLabel(tile.row, tile.column));
-//					System.out.println(Board.getInstance().getHotelTiles());
 					List<String> hotels = playerController.playBuy(player);
 					
 					for (String hotel : hotels) {
-						// System.out.println("\nBuying .." + hotel +
-						// " Share : " + Share.getSharePrice(hotel));
-
 						adminController.playerBuyMove(hotel);
 					}
-					System.out.println("Player " + player.getName() + " bought " + hotels);
+
 					adminController.playerDone();
 
 				}
-//				System.out.println(adminController.getWinner());
-				results.put(adminController.getWinner(),
-						results.get(adminController.getWinner()) + 1);
-
+				
+				System.out.println(adminController.getWinner());
+				List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
+				for (Player p: playersFinalScore) 
+					System.out.println(p.getName()+ " : " + p.getCash());
+				String winner = adminController.getWinner();
+//				System.out.println(results.get(winner));
+				results.put(winner,
+						results.get(winner) + 1);
+//				System.out.println("Game ended! ");
+				System.out.println("Stats: " + results);
+		}
 				// if (results.get(adminController.getWinner()) != null)
 				// current += results.get(adminController.getWinner());
 
-			}
-			System.out.println("Game ended! ");
 			
-			System.out.println(results);
+			System.out.println("Final Stats: " + results);
 		
 		} catch (AcquireException e) {
 			System.out.println(e.getMessage());
