@@ -84,9 +84,9 @@ public class GameController {
 				
 				//System.out.println(adminController.getWinner());
 				List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
+				String winner = adminController.getWinner();
 				for (Player p: playersFinalScore) 
 					System.out.println(p.getName()+ " : " + p.getCash());
-				String winner = adminController.getWinner();
 //				System.out.println(results.get(winner));
 				results.put(winner,
 						results.get(winner) + 1);

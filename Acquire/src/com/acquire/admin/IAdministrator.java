@@ -306,9 +306,9 @@ public class IAdministrator implements Administrator {
 			String label = playerSharesEntry.getKey();
 			int numberOfShares = playerSharesEntry.getValue();
 			int sharePrice = Share.getSharePrice(label);
-			worthOfAPlayer=(sharePrice*numberOfShares)+cash;
+			worthOfAPlayer+=(sharePrice*numberOfShares);
 		}
-		worthOfAPlayer = cash;
+		worthOfAPlayer += cash;
 		return worthOfAPlayer;
 	}
 

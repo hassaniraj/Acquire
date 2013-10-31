@@ -1,8 +1,10 @@
 package com.acquire.proxy;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 import com.acquire.admin.Administrator;
 import com.acquire.admin.IAdministrator;
@@ -61,22 +63,14 @@ public class AdminControls implements AdminController {
 
 	@Override
 	public String getWinner() {
+		TreeMap<Integer,Player> playerCash=new TreeMap<>(Collections.reverseOrder());
 		List<Player> players = Game.getInstance().getGame(Board.getInstance());
-		String winner = "";
-		int max = 0;
-		List<String> hotels = new ArrayList<>(Labels.getLabels());
-		
-		admin.getBonus(players, hotels);
 		
 		for (Player player : players) {
 			int finalWorth = admin.getWorth(player);
-			if (max < finalWorth) {
-				max = finalWorth;
-				winner = player.getName();
-			}
-
+			player.setCash(finalWorth);
+			playerCash.put(player.getCash(), player);
 		}
-		// winner=playerWorthMap.keySet().iterator().next();
-		return winner;
+		return playerCash.firstEntry().getValue().getName();
 	}
 }

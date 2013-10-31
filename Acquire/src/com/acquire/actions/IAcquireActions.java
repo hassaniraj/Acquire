@@ -395,6 +395,8 @@ public class IAcquireActions implements AcquireActions {
 							+ (player.getShare(hotel) * Share
 									.getSharePrice(hotel)));
 					player.setShare(hotel, 0);
+					Share.setShare(hotel, 25);
+					
 				}
 			}
 
