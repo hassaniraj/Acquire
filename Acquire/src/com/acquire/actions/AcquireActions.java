@@ -15,5 +15,4 @@ public interface AcquireActions {
 	boolean founding (Board board, String row, String column, String label);
 	Set <String> merging (Board board, String row, String column, String label);
 	Map<String, List<String>> getLabel(Board board, String row, String column);
-	void setPlayersContainingShares(List<String> hotels, List<Player> players);
 }

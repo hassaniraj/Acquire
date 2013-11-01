@@ -1,11 +1,13 @@
 package com.acquire.admin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.TreeMap;
 
 import com.acquire.actions.AcquireActions;
@@ -108,7 +110,11 @@ public class IAdministrator implements Administrator {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
 					board, tile.getRow(), tile.getColumn());
 			List<String> h = new ArrayList<String>(hotelList.keySet());
-			acquireActions.merging(board,tile.getRow(), tile.getColumn(), h.get(0));
+			Set<String> acquired = acquireActions.merging(board,tile.getRow(), tile.getColumn(), h.get(0));
+			if (acquired.size() > 1) {
+				setBonus(acquired);
+				sell(acquired);
+			}
 			player.removeTile(tile);
 		} else {
 			Hotel hotel = new Hotel();
@@ -233,12 +239,6 @@ public class IAdministrator implements Administrator {
 		return Share.getSharePrice(hotel);
 	}
 
-	@Override
-	public double getBonus(List<Player> player, List<String> hotel) {
-		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
-		acquireActions.setPlayersContainingShares(hotel, player);
-		return 0;
-	}
 //
 //	@Override
 //	public void getFinalScore(List<String> players, List<String> hotels) {
@@ -310,6 +310,124 @@ public class IAdministrator implements Administrator {
 		}
 		worthOfAPlayer += cash;
 		return worthOfAPlayer;
+	}
+	
+	/**
+	 * Method to set the bonus of the player
+	 * 
+	 * @param acquired
+	 */
+	public void setBonus(Set<String> acquired) {
+		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		List<String> hotels = new ArrayList<>(acquired);
+		hotels.remove(0);
+		setPlayersContainingShares(hotels, players);
+	}
+
+	/**
+	 * Method to set the players containing the cash in a map
+	 * 
+	 * @param hotels
+	 * @param players
+	 */
+
+	@Override
+	public void setPlayersContainingShares(List<String> hotels,
+			List<Player> players) {
+		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(
+				Collections.reverseOrder());
+		for (String hotel : hotels) {
+			for (Player player : players) {
+				if (player.getShares().containsKey(hotel)) {
+					int playerShares = player.getShare(hotel);
+					if (playerShareMap.containsKey(playerShares)) {
+						playerShareMap.get(playerShares).add(player);
+					} else {
+						List<Player> playerList = new ArrayList<>();
+						playerList.add(player);
+						playerShareMap.put(playerShares, playerList);
+					}
+				}
+			}
+			setCash(playerShareMap, hotel);
+		}
+	}
+
+	/**
+	 * Method to set cash for the player for the bonus
+	 * 
+	 * @param playerShareMap
+	 * @param hotel
+	 */
+	@Override
+	public void setCash(TreeMap<Integer, List<Player>> playerShareMap,
+			String hotel) {
+		boolean isFirstPlayer = true;
+		for (Map.Entry<Integer, List<Player>> entry : playerShareMap.entrySet()) {
+			if (entry.getValue().size() > 1) {
+				if (isFirstPlayer) {
+					int price = Share.getSharePrice(hotel);
+					price = price * 15;
+					isFirstPlayer = false;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				} else {
+					int price = Share.getSharePrice(hotel);
+					price = price * 5;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				}
+
+			} else if (entry.getValue().size() == 1) {
+				if (isFirstPlayer) {
+					int price = Share.getSharePrice(hotel);
+					price = price * 10;
+					isFirstPlayer = false;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash() + price);
+					}
+				} else {
+					int price = Share.getSharePrice(hotel);
+					price = price * 5;
+					for (Player player : entry.getValue()) {
+						player.setCash(player.getCash()
+								+ (price / entry.getValue().size()));
+					}
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Method to sell the shares for the player after getting the bonus
+	 * 
+	 * @param acquired
+	 */
+	@Override
+	public void sell(Set<String> acquired) {
+		List<String> hotels = new ArrayList<>(acquired);
+		hotels.remove(0);
+		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		for (String hotel : hotels) {
+			for (Player player : players) {
+				if (player.getShares().containsKey(hotel)) {
+					player.setCash(player.getCash()
+							+ (player.getShare(hotel) * Share
+									.getSharePrice(hotel)));
+					player.setShare(hotel, 0);
+					Share.setShare(hotel, 25);
+					
+				}
+			}
+
+		}
 	}
 
 }

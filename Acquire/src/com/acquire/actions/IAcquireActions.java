@@ -222,10 +222,7 @@ public class IAcquireActions implements AcquireActions {
 					Chain.setChain(maxLabel, neighbour);
 				}
 			}
-			if (acquired.size() > 1) {
-				setBonus(acquired);
-				sell(acquired);
-			}
+			
 			return acquired;
 		}
 		return null;
@@ -287,120 +284,6 @@ public class IAcquireActions implements AcquireActions {
 		return false;
 	}
 
-	/**
-	 * Method to set the bonus of the player
-	 * 
-	 * @param acquired
-	 */
-	public void setBonus(Set<String> acquired) {
-		List<Player> players = Game.getInstance().getGame(Board.getInstance());
-		List<String> hotels = new ArrayList<>(acquired);
-		hotels.remove(0);
-		setPlayersContainingShares(hotels, players);
-	}
-
-	/**
-	 * Method to set the players containing the cash in a map
-	 * 
-	 * @param hotels
-	 * @param players
-	 */
-
-	@Override
-	public void setPlayersContainingShares(List<String> hotels,
-			List<Player> players) {
-		TreeMap<Integer, List<Player>> playerShareMap = new TreeMap<>(
-				Collections.reverseOrder());
-		for (String hotel : hotels) {
-			for (Player player : players) {
-				if (player.getShares().containsKey(hotel)) {
-					int playerShares = player.getShare(hotel);
-					if (playerShareMap.containsKey(playerShares)) {
-						playerShareMap.get(playerShares).add(player);
-					} else {
-						List<Player> playerList = new ArrayList<>();
-						playerList.add(player);
-						playerShareMap.put(playerShares, playerList);
-					}
-				}
-			}
-			setCash(playerShareMap, hotel);
-		}
-	}
-
-	/**
-	 * Method to set cash for the player for the bonus
-	 * 
-	 * @param playerShareMap
-	 * @param hotel
-	 */
-	public void setCash(TreeMap<Integer, List<Player>> playerShareMap,
-			String hotel) {
-		boolean isFirstPlayer = true;
-		for (Map.Entry<Integer, List<Player>> entry : playerShareMap.entrySet()) {
-			if (entry.getValue().size() > 1) {
-				if (isFirstPlayer) {
-					int price = Share.getSharePrice(hotel);
-					price = price * 15;
-					isFirstPlayer = false;
-					for (Player player : entry.getValue()) {
-						player.setCash(player.getCash()
-								+ (price / entry.getValue().size()));
-					}
-					break;
-				} else {
-					int price = Share.getSharePrice(hotel);
-					price = price * 5;
-					for (Player player : entry.getValue()) {
-						player.setCash(player.getCash()
-								+ (price / entry.getValue().size()));
-					}
-					break;
-				}
-
-			} else if (entry.getValue().size() == 1) {
-				if (isFirstPlayer) {
-					int price = Share.getSharePrice(hotel);
-					price = price * 10;
-					isFirstPlayer = false;
-					for (Player player : entry.getValue()) {
-						player.setCash(player.getCash() + price);
-					}
-				} else {
-					int price = Share.getSharePrice(hotel);
-					price = price * 5;
-					for (Player player : entry.getValue()) {
-						player.setCash(player.getCash()
-								+ (price / entry.getValue().size()));
-					}
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Method to sell the shares for the player after getting the bonus
-	 * 
-	 * @param acquired
-	 */
-	public void sell(Set<String> acquired) {
-		List<String> hotels = new ArrayList<>(acquired);
-		hotels.remove(0);
-		List<Player> players = Game.getInstance().getGame(Board.getInstance());
-		for (String hotel : hotels) {
-			for (Player player : players) {
-				if (player.getShares().containsKey(hotel)) {
-					player.setCash(player.getCash()
-							+ (player.getShare(hotel) * Share
-									.getSharePrice(hotel)));
-					player.setShare(hotel, 0);
-					Share.setShare(hotel, 25);
-					
-				}
-			}
-
-		}
-	}
+	
 
 }

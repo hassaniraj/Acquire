@@ -3,6 +3,8 @@ package com.acquire.admin;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 
 import com.acquire.board.Board;
 import com.acquire.board.Game;
@@ -67,5 +69,9 @@ public interface Administrator {
 	
 	int getWorth(Player player);
 
-	double getBonus(List<Player> player, List<String> hotel);
+	void setPlayersContainingShares(List<String> hotels, List<Player> players);
+
+	void setCash(TreeMap<Integer, List<Player>> playerShareMap, String hotel);
+
+	void sell(Set<String> acquired);
 }
