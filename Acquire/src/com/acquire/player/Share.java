@@ -32,6 +32,10 @@ public class Share {
 		return shares.get(name);
 	}
 	
+	public static synchronized Map<String, Integer> getShare() {
+		return shares;
+	}
+	
 	public static synchronized void setShare(String name, int share) {
 		shares.put(name, share);
 	}

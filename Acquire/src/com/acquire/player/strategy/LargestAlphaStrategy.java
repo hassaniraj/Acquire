@@ -4,7 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.sound.sampled.ReverbType;
 
@@ -16,6 +20,7 @@ import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.exception.AcquireException;
 import com.acquire.factory.BoardFactory;
+import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
 
@@ -97,6 +102,52 @@ public class LargestAlphaStrategy implements PlayerStrategy {
 		});
 		
 		return tiles.get(0);
+	}
+
+	@Override
+	public StateClient playTile(List<StateClient> children) {
+		// Administrator administrator = IAdministrator.getInstance();
+		// Board board = BoardFactory.getBoard();
+		// administrator.setCurrentPlayer(player);
+		if (children.size() > 0) {
+		String label = "";
+		Map<Tile, StateClient> tiles = new HashMap<>();
+		List<String> hotels = new ArrayList<>();
+		//hotels=Labels.getLabels();
+		hotels = children.get(0).getState().getHotels();
+		for (int i = 0; i < children.size(); i++) {
+			tiles.put(children.get(i).getTile(), children.get(i));
+		}
+
+		// String label = "";
+		// if (hotels.size() > 0)
+		// label = pickHotel(hotels);
+		if (!tiles.isEmpty()) {
+			Tile tile = pickTile(new ArrayList<>(tiles.keySet()));
+			label = pickHotel(hotels);
+			tiles.get(tile).setHotel(label);
+
+			return tiles.get(tile);
+		}
+		}
+		return null;
+
+	}
+
+	@Override
+	public List<String> buyShare(StateClient state, Set<List<String>> shareCombinations) {
+		// TODO Auto-generated method stub
+		Iterator<List<String>> iter = shareCombinations.iterator();
+
+		while (iter.hasNext() && shareCombinations.size() > 0) {
+			List<String> nextELement = iter.next();
+			if (nextELement.size() == 3){
+				System.out.println(nextELement);
+				return nextELement;
+			}
+		}
+		
+		return new ArrayList<>();
 	}
 
 }

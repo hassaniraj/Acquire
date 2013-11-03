@@ -58,8 +58,8 @@ public class IAdministrator implements Administrator {
 	@Override
 	public Board startGame(Game game, List<Player> players) {		
 		Board board = BoardFactory.getBoard();
-		board.clear();
-		board = BoardFactory.getBoard();		
+//		board.clear();
+//		board = BoardFactory.getBoard();		
 		
 		Random rand = new Random();
 		List<String> tiles = new ArrayList<String>();
@@ -80,8 +80,8 @@ public class IAdministrator implements Administrator {
 		if (game.getGame(board) != null)
 		game.getGame(board).clear();
 		game.setGame(board, players);
-		playerIterator = players.iterator();
-		currentPlayer = playerIterator.next();
+//		playerIterator = players.iterator();
+//		currentPlayer = playerIterator.next();
 		return board;
 	}
 
@@ -100,12 +100,13 @@ public class IAdministrator implements Administrator {
 		} else if (type.equals("growing")) {
 			acquireActions.growing(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
-		} else if (type.equals("founding") && !label.equals("") && label != null) {
+		} else if (label != null) {
+			if (type.equals("founding") && !label.equals("")) {
 			acquireActions.founding(board, tile.getRow(), tile.getColumn(), label);
 			player.setShare(label, player.getShare(label) + 1);
 			Share.setShare(label, Share.getShare(label) - 1);
 			player.removeTile(tile);
-			
+			}
 		} else if (type.equals("merging")) {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
 					board, tile.getRow(), tile.getColumn());
@@ -265,12 +266,12 @@ public class IAdministrator implements Administrator {
 			player.setTile(newTile.substring(newTile.length() - 1),
 					newTile.substring(0, newTile.length() - 1));
 		}
-		if (playerIterator.hasNext()) {
-			currentPlayer = playerIterator.next();
-		} else {
-			playerIterator = Game.getInstance().getGame(board).iterator();
-			currentPlayer = playerIterator.next();
-		}
+//		if (playerIterator.hasNext()) {
+//			currentPlayer = playerIterator.next();
+//		} else {
+//			playerIterator = Game.getInstance().getGame(board).iterator();
+//			currentPlayer = playerIterator.next();
+//		}
 
 	}
 	
