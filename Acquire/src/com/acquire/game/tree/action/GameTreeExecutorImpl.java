@@ -119,9 +119,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		
 		List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
 		String winner = adminTreeInspector.getWinner();
-		for (Player p: playersFinalScore) 
-			System.out.println(p.getName()+ " : " + p.getCash());
-		System.out.println(winner);
+		System.out.println("The winner is " + winner);
 	}
 
 	@Override
