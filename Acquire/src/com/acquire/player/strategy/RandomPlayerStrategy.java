@@ -119,7 +119,6 @@ public class RandomPlayerStrategy implements PlayerStrategy {
 			List<String> nextELement = pickHotel(shareCombinations);
 //			int random = new Random().nextInt(1);
 			//if (nextELement.size() == 3)
-			System.out.println(nextELement);
 				return nextELement;
 		}
 		

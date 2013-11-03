@@ -106,9 +106,9 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 					root.getPlayer());
 			if (state == null) break;
 			if (isEnd()) break;
-			System.out.println(state.getMove());
-			System.out.println(state.getTile().getColumn()
-					+ state.getTile().getRow());
+//			System.out.println(state.getMove());
+//			System.out.println(state.getTile().getColumn()
+//					+ state.getTile().getRow());
 			adminTreeInspector.place(state.getTile(), state.getMove(), state,
 					this.root.getPlayer());
 			root.getState().setShareCombinations();

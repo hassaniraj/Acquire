@@ -69,7 +69,6 @@ public class SequentialPlayerStrategy implements PlayerStrategy {
 			hotels.add(hotel);
 			// administrator.getHotelShares(board, player, hotel);
 		}
-		System.out.println(hotels);
 		return hotels;
 	}
 
@@ -137,7 +136,6 @@ public class SequentialPlayerStrategy implements PlayerStrategy {
 			List<String> nextELement = iter.next();
 			if (nextELement.size() == 3)
 			{
-				System.out.println(nextELement);
 				return nextELement;
 			}
 		}

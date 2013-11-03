@@ -139,7 +139,6 @@ public class SmallestAntiStrategy implements PlayerStrategy{
 		while (iter.hasNext() && shareCombinations.size() > 0) {
 			List<String> nextELement = pickTile(shareCombinations);
 			if (nextELement.size() == 3) {
-				System.out.println(nextELement);
 				return nextELement;
 			}
 		}
@@ -149,7 +148,6 @@ public class SmallestAntiStrategy implements PlayerStrategy{
 
 	private List<String> pickTile(Set<List<String>> shareCombinations) {
 		List<List<String>> hotels = new ArrayList<>(shareCombinations);
-		System.out.println(hotels);
 		return hotels.get(hotels.size() - 1);
 	}
 }

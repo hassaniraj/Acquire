@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.acquire.board.Board;
+import com.acquire.board.Chain;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.factory.BoardFactory;
@@ -62,6 +63,7 @@ public class StateImpl implements State {
 	@Override
 	public void setShareCombinations() {
 		Map<String, Integer> shareCount = new HashMap<>(Share.getShare());
+		hotels = new ArrayList<String>(board.getHotelTiles().keySet());
 		for (int i = 0; i < hotels.size(); i++) {
 			if (shareCount.get(hotels.get(i)) > 0) {
 				shareCombinations.add(new ArrayList<>(Arrays.asList(hotels
@@ -122,7 +124,8 @@ public class StateImpl implements State {
 	public void setup() {
 //		board.clear();
 		board = BoardFactory.getBoard();
-		hotels = Labels.getLabels();
+		hotels = new ArrayList<String>(board.getHotelTiles().keySet());
+		
 		for (int i = 0; i < hotels.size(); i++) {
 			shareCombinations
 					.add(new ArrayList<>(Arrays.asList(hotels.get(i))));
