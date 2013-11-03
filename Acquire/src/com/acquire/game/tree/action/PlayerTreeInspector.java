@@ -7,5 +7,11 @@ import com.acquire.player.Player;
 
 public interface PlayerTreeInspector {
 
+	/**
+	 * Pick each node from tree and decide move
+	 * @param root
+	 * @param player
+	 * @return
+	 */
 	StateClient pickState(StateClient root, Player player);
 }

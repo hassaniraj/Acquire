@@ -12,9 +12,13 @@ import com.acquire.board.Tile;
 import com.acquire.factory.BoardFactory;
 import com.acquire.player.Player;
 
+/**
+ * Class that handles every new node created (flyweight pattern)
+ * 
+ */
 public class StateClient {
 	private Player player;
-	
+
 	public Player getPlayer() {
 		if (player == null)
 			player = new Player();
@@ -26,7 +30,7 @@ public class StateClient {
 	}
 
 	private String hotel;
-	
+
 	public String getHotel() {
 		return hotel;
 	}
@@ -36,6 +40,7 @@ public class StateClient {
 	}
 
 	private List<String> shares;
+
 	public List<String> getShares() {
 		if (shares == null)
 			shares = new ArrayList<>();
@@ -46,8 +51,11 @@ public class StateClient {
 		this.shares = shares;
 	}
 
+	/**
+	 * List of all children
+	 */
 	private List<StateClient> children;
-	
+
 	public List<StateClient> getChildren() {
 		if (children == null)
 			children = new ArrayList<>();
@@ -59,7 +67,7 @@ public class StateClient {
 	}
 
 	private Tile tile;
-	
+
 	public Tile getTile() {
 		return tile;
 	}
@@ -69,20 +77,30 @@ public class StateClient {
 	}
 
 	enum Moves {
-		SINGLETON ("singleton"), FOUNDING ("founding"), MERGING ("merging"), GROWING ("growing"), NONE ("none");
-		
+		SINGLETON("singleton"), FOUNDING("founding"), MERGING("merging"), GROWING(
+				"growing"), NONE("none");
+
 		String value;
+
 		private Moves(String value) {
-			 this.value = value;
+			this.value = value;
 		}
-	
+
 		public String getMove() {
 			return value;
 		}
 	}
+
 	State state = StateFactory.getInstance();
 	String move;
-	
+
+	/**
+	 * Inspect tile and set type of move in the node.
+	 * @param board
+	 * @param row
+	 * @param column
+	 * @return
+	 */
 	public String inspect(Board board, String row, String column) {
 		ArrayList<String> hotels;
 		hotels = new ArrayList<>();
@@ -131,21 +149,25 @@ public class StateClient {
 		int rowIndex = BoardFactory.getBoard().getRows().indexOf(row);
 		int columnIndex = BoardFactory.getBoard().getColumns().indexOf(column);
 		if (rowIndex - 1 > 0) {
-			position.add(column + BoardFactory.getBoard().getRows()
-					.get(rowIndex - 1));
-			if (board.getBoard().get(column +
-					BoardFactory.getBoard().getRows().get(rowIndex - 1)) != null) {
-				positions.add(column + BoardFactory.getBoard().getRows()
-						.get(rowIndex - 1));
+			position.add(column
+					+ BoardFactory.getBoard().getRows().get(rowIndex - 1));
+			if (board.getBoard().get(
+					column
+							+ BoardFactory.getBoard().getRows()
+									.get(rowIndex - 1)) != null) {
+				positions.add(column
+						+ BoardFactory.getBoard().getRows().get(rowIndex - 1));
 			}
 		}
 		if (rowIndex + 1 < BoardFactory.getBoard().getRows().size()) {
-			position.add(column + BoardFactory.getBoard().getRows()
-					.get(rowIndex + 1));
-			if (board.getBoard().get(column +
-					BoardFactory.getBoard().getRows().get(rowIndex + 1)) != null) {
-				positions.add(column + BoardFactory.getBoard().getRows()
-						.get(rowIndex + 1));
+			position.add(column
+					+ BoardFactory.getBoard().getRows().get(rowIndex + 1));
+			if (board.getBoard().get(
+					column
+							+ BoardFactory.getBoard().getRows()
+									.get(rowIndex + 1)) != null) {
+				positions.add(column
+						+ BoardFactory.getBoard().getRows().get(rowIndex + 1));
 			}
 		}
 		if (columnIndex - 1 > 0) {
@@ -173,12 +195,12 @@ public class StateClient {
 			}
 		}
 
-		return positions; 
+		return positions;
 	}
-	
+
 	public Map<String, Object> generate(Board board, String row, String column) {
-//		state.generate(board, row, column, inspect (board, row, column));
-		Map <String, Object> result = new HashMap<String, Object>();
+		// state.generate(board, row, column, inspect (board, row, column));
+		Map<String, Object> result = new HashMap<String, Object>();
 		String move = inspect(board, row, column);
 		result.put("move", move);
 		Tile tile = new Tile();

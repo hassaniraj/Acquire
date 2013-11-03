@@ -5,14 +5,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.acquire.board.Board;
-import com.acquire.board.Chain;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.factory.BoardFactory;
@@ -163,13 +161,6 @@ public class StateImpl implements State {
 		Set<List<String>> result = new LinkedHashSet<>(shares);
 		shareCombinations = result;
 		hotels = Labels.getLabels();
-	}
-
-	@Override
-	public void generate(Board board, String row, String column, String move) {
-		// generate the next states
-		// change board state
-
 	}
 
 	@Override
