@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.acquire.admin.IAdministrator;
+import com.acquire.config.Config;
 
 public class Board {
 	private Map <String, Hotel> board;
@@ -53,7 +54,7 @@ public class Board {
 		Map <String, Hotel> occupiedTiles = getOccupiedTiles();
 		//Map <String, List<String>> hotelTiles = new HashMap<>();
 		for (String tile : occupiedTiles.keySet()) {
-			if (!occupiedTiles.get(tile).getLabel().equals("singleton")) {
+			if (!occupiedTiles.get(tile).getLabel().equals(Config.Moves.SINGLETON.getMove())) {
 				if (!hotelTiles.containsKey(occupiedTiles.get(tile).getLabel())) {
 					hotelTiles.put(occupiedTiles.get(tile).getLabel(), new HashSet<>(Arrays.asList(tile)));
 				} else {

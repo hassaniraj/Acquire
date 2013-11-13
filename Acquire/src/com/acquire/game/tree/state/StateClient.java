@@ -9,7 +9,7 @@ import java.util.Set;
 
 import com.acquire.board.Board;
 import com.acquire.board.Tile;
-import com.acquire.factory.BoardFactory;
+import com.acquire.config.Config;
 import com.acquire.player.Player;
 
 /**
@@ -76,21 +76,6 @@ public class StateClient {
 		this.tile = tile;
 	}
 
-	enum Moves {
-		SINGLETON("singleton"), FOUNDING("founding"), MERGING("merging"), GROWING(
-				"growing"), NONE("none");
-
-		String value;
-
-		private Moves(String value) {
-			this.value = value;
-		}
-
-		public String getMove() {
-			return value;
-		}
-	}
-
 	State state = StateFactory.getInstance();
 	String move;
 
@@ -115,19 +100,19 @@ public class StateClient {
 			Set<String> set = new HashSet<>(hotels);
 			// for (String h : hotels) {
 			if (set.size() == 1) {
-				if (hotels.get(0).equals("singleton")) {
-					return "founding";
+				if (hotels.get(0).equals(Config.Moves.SINGLETON.getMove())) {
+					return Config.Moves.FOUNDING.getMove();
 				} else
-					return "growing";
+					return Config.Moves.GROWING.getMove();
 			} else
-				return "merging";
+				return Config.Moves.MERGING.getMove();
 			// }
-		} else if (neighbors.size() == 1 && hotels.get(0).equals("singleton")) {
-			return "founding";
+		} else if (neighbors.size() == 1 && hotels.get(0).equals(Config.Moves.SINGLETON.getMove())) {
+			return Config.Moves.FOUNDING.getMove();
 		} else if (neighbors.size() == 1 && !hotels.isEmpty()) {
-			return "growing";
+			return Config.Moves.GROWING.getMove();
 		} else if (neighbors.size() == 0) {
-			return "singleton";
+			return Config.Moves.SINGLETON.getMove();
 		}
 
 		return null;

@@ -17,6 +17,7 @@ import com.acquire.board.Game;
 import com.acquire.board.Hotel;
 import com.acquire.board.SharePriceMapper;
 import com.acquire.board.Tile;
+import com.acquire.config.Config;
 import com.acquire.factory.AcquireActionsFactory;
 import com.acquire.factory.BoardFactory;
 import com.acquire.player.Player;
@@ -94,20 +95,20 @@ public class IAdministrator implements Administrator {
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
 		String type = acquireActions.inspect(board, tile.getRow(), tile.getColumn());
-		if (type.equals("singleton")) {
+		if (type.equals(Config.Moves.SINGLETON.getMove())) {
 			acquireActions.singleton(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
-		} else if (type.equals("growing")) {
+		} else if (type.equals(Config.Moves.GROWING.getMove())) {
 			acquireActions.growing(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
 		} else if (label != null) {
-			if (type.equals("founding") && !label.equals("")) {
+			if (type.equals(Config.Moves.FOUNDING.getMove()) && !label.equals("")) {
 			acquireActions.founding(board, tile.getRow(), tile.getColumn(), label);
 			player.setShare(label, player.getShare(label) + 1);
 			Share.setShare(label, Share.getShare(label) - 1);
 			player.removeTile(tile);
 			}
-		} else if (type.equals("merging")) {
+		} else if (type.equals(Config.Moves.MERGING.getMove())) {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
 					board, tile.getRow(), tile.getColumn());
 			List<String> h = new ArrayList<String>(hotelList.keySet());
@@ -119,7 +120,7 @@ public class IAdministrator implements Administrator {
 			player.removeTile(tile);
 		} else {
 			Hotel hotel = new Hotel();
-			hotel.setLabel("singleton");
+			hotel.setLabel(Config.Moves.SINGLETON.getMove());
 			board.getBoard().put(tile.getColumn() + tile.getRow(), hotel);
 			player.removeTile(tile);
 		}

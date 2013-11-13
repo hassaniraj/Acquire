@@ -14,6 +14,7 @@ import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Hotel;
 import com.acquire.board.Labels;
+import com.acquire.config.Config;
 import com.acquire.factory.BoardFactory;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
@@ -38,19 +39,19 @@ public class IAcquireActions implements AcquireActions {
 			Set<String> set = new HashSet<>(hotels);
 			// for (String h : hotels) {
 			if (set.size() == 1) {
-				if (hotels.get(0).equals("singleton")) {
-					return "founding";
+				if (hotels.get(0).equals(Config.Moves.SINGLETON.getMove())) {
+					return Config.Moves.FOUNDING.getMove();
 				} else
-					return "growing";
+					return Config.Moves.GROWING.getMove();
 			} else
-				return "merging";
+				return Config.Moves.MERGING.getMove();
 			// }
-		} else if (neighbors.size() == 1 && hotels.get(0).equals("singleton")) {
-			return "founding";
+		} else if (neighbors.size() == 1 && hotels.get(0).equals(Config.Moves.SINGLETON.getMove())) {
+			return Config.Moves.FOUNDING.getMove();
 		} else if (neighbors.size() == 1 && !hotels.isEmpty()) {
-			return "growing";
+			return Config.Moves.GROWING.getMove();
 		} else if (neighbors.size() == 0) {
-			return "singleton";
+			return Config.Moves.SINGLETON.getMove();
 		}
 
 		return null;
@@ -120,9 +121,9 @@ public class IAcquireActions implements AcquireActions {
 	@Override
 	public boolean singleton(Board board, String row, String column) {
 		String type = inspect(board, row, column);
-		if (type.equalsIgnoreCase("singleton")) {
+		if (type.equalsIgnoreCase(Config.Moves.SINGLETON.getMove())) {
 			Hotel hotel = new Hotel();
-			hotel.setLabel("singleton");
+			hotel.setLabel(Config.Moves.SINGLETON.getMove());
 			board.getBoard().put(column + row, hotel);
 			return true;
 		}
@@ -133,7 +134,7 @@ public class IAcquireActions implements AcquireActions {
 	@Override
 	public Hotel growing(Board board, String row, String column) {
 		String type = inspect(board, row, column);
-		if (type.equalsIgnoreCase("growing")) {
+		if (type.equalsIgnoreCase(Config.Moves.GROWING.getMove())) {
 			Hotel hotel = new Hotel();
 			Set<String> set = new HashSet<>(hotels);
 			hotel.setLabel(hotels.get(0));
@@ -149,7 +150,7 @@ public class IAcquireActions implements AcquireActions {
 	public boolean founding(Board board, String row, String column, String label) {
 		String type = inspect(board, row, column);
 		List<String> neighbors = checkNeighbor(row, column, board);
-		if (type.equalsIgnoreCase("founding")) {
+		if (type.equalsIgnoreCase(Config.Moves.FOUNDING.getMove())) {
 			Hotel hotel = new Hotel();
 			hotel.setLabel(label);
 			for (String tile : neighbors) {
@@ -171,14 +172,14 @@ public class IAcquireActions implements AcquireActions {
 		Set<String> acquired = new HashSet<>();
 		String type = inspect(board, row, column);
 		String maxLabel = "";
-		if (type.equalsIgnoreCase("merging")) {
+		if (type.equalsIgnoreCase(Config.Moves.MERGING.getMove())) {
 			int max = 0;
 
 			if (checkIfEqual()) {
 				maxLabel = label;
 			} else if (!impossible()) {
 				for (String hotel : hotels) {
-					if (!hotel.equalsIgnoreCase("singleton")) {
+					if (!hotel.equalsIgnoreCase(Config.Moves.SINGLETON.getMove())) {
 						List<String> chain = Chain.getChain(hotel);
 						if (max < chain.size()) {
 							max = chain.size();
@@ -196,7 +197,7 @@ public class IAcquireActions implements AcquireActions {
 			acquired.add(maxLabel);
 			for (String hotelName : hotels) {
 				if (!hotelName.equals(maxLabel)) {
-					if (!hotelName.equalsIgnoreCase("singleton")) {
+					if (!hotelName.equalsIgnoreCase(Config.Moves.SINGLETON.getMove())) {
 						acquired.add(hotelName);
 						List<String> chain = Chain.getChain(hotelName);
 						if (chain != null) {
@@ -217,7 +218,7 @@ public class IAcquireActions implements AcquireActions {
 
 			for (String neighbour : neighbours) {
 				if (board.getBoard().get(neighbour).getLabel()
-						.equals("singleton")) {
+						.equals(Config.Moves.SINGLETON.getMove())) {
 					board.getBoard().put(neighbour, hotel);
 					Chain.setChain(maxLabel, neighbour);
 				}
@@ -234,7 +235,7 @@ public class IAcquireActions implements AcquireActions {
 		inspect(board, row, column);
 		Map<String, List<String>> chains = new HashMap<>();
 		for (String hotel : hotels) {
-			if (!hotel.equals("singleton"))
+			if (!hotel.equals(Config.Moves.SINGLETON.getMove()))
 				chains.put(hotel, Chain.getChain(hotel));
 		}
 		return chains;
@@ -248,7 +249,7 @@ public class IAcquireActions implements AcquireActions {
 	public boolean checkIfEqual() {
 		int max = 0;
 		for (String hotel : hotels) {
-			if (!hotel.equals("singleton")) {
+			if (!hotel.equals(Config.Moves.SINGLETON.getMove())) {
 				List<String> chain = Chain.getChain(hotel);
 				if (max != chain.size() && max != 0) {
 					max = chain.size();
@@ -270,7 +271,7 @@ public class IAcquireActions implements AcquireActions {
 	public boolean impossible() {
 		int max = 0;
 		for (String hotel : hotels) {
-			if (!hotel.equals("singleton")) {
+			if (!hotel.equals(Config.Moves.SINGLETON.getMove())) {
 				List<String> chain = Chain.getChain(hotel);
 				if (max != chain.size() && max != 0) {
 					max = chain.size();
