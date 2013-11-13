@@ -2,6 +2,7 @@ package com.acquire.game.tree.action;
 
 import java.util.List;
 
+import com.acquire.board.Board;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 
@@ -33,7 +34,7 @@ public interface GameTreeExecutor {
 	/**
 	 * rotate player after one complete turn
 	 */
-	void rotate();
+	void rotate(Board board);
 	
 	/**
 	 * play the game
@@ -41,7 +42,7 @@ public interface GameTreeExecutor {
 	 * @param stateClient
 	 * @param playerTreeInspector
 	 */
-	void playGame(AdminTreeInspector adminTreeInspector,
+	void playGame(Board board, AdminTreeInspector adminTreeInspector,
 			StateClient stateClient, PlayerTreeInspector playerTreeInspector);
 	
 	/**
@@ -55,4 +56,6 @@ public interface GameTreeExecutor {
 	 * @return
 	 */
 	List<String> getHotels();
+
+	
 }

@@ -2,6 +2,7 @@ package com.acquire.game.tree.action;
 
 import java.util.List;
 
+import com.acquire.board.Board;
 import com.acquire.board.Tile;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
@@ -13,7 +14,7 @@ public interface AdminTreeInspector {
 	 * @param players
 	 * @return
 	 */
-	List<Player> init(List<Player> players);
+	Board init(List<Player> players);
 
 	/**
 	 * Place tile on given board
@@ -28,5 +29,5 @@ public interface AdminTreeInspector {
 	 * Get the winner of the game
 	 * @return
 	 */
-	String getWinner();
+	String getWinner(Board board);
 }

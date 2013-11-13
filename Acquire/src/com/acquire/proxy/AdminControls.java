@@ -18,10 +18,10 @@ public class AdminControls implements AdminController {
 	private Administrator admin;
 
 	@Override
-	public Player init(List<Player> players) {
+	public Board init(List<Player> players) {
 		admin = IAdministrator.getInstance();
-		admin.startGame(Game.getInstance(), players);
-		return admin.getCurrentPlayer();
+		Board board = admin.startGame(Game.getInstance(), players);
+		return board;
 	}
 
 	@Override

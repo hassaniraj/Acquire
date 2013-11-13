@@ -21,7 +21,6 @@ import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
 
-
 public class GameTreeExecutorImpl implements GameTreeExecutor {
 	private static Iterator<Player> playerIterator;
 	private Player currentPlayer;
@@ -51,40 +50,41 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		PlayerTreeInspector playerTreeInspector = new PlayerTreeInspectorImpl();
 
 		List<Player> players = new ArrayList<>();
-		 Player player1 = new Player();
-		 player1.setName("random");
-		 player1.setStrategy(new RandomPlayerStrategy());
-		 players.add(player1);
+		Player player1 = new Player();
+		player1.setName("random");
+		player1.setStrategy(new RandomPlayerStrategy());
+		players.add(player1);
 
 		Player player2 = new Player();
 		player2.setName("sequential");
 		player2.setStrategy(new SequentialPlayerStrategy());
 		players.add(player2);
 
-		 Player player4 = new Player();
-		 player4.setName("smallest-anti");
-		 player4.setStrategy(new SmallestAntiStrategy());
-		 players.add(player4);
-		
-		 Player player3 = new Player();
-		 player3.setName("largest-alpha");
-		 player3.setStrategy(new LargestAlphaStrategy());
-		 players.add(player3);
+		Player player4 = new Player();
+		player4.setName("smallest-anti");
+		player4.setStrategy(new SmallestAntiStrategy());
+		players.add(player4);
 
-		players = adminTreeInspector.init(players);
+		Player player3 = new Player();
+		player3.setName("largest-alpha");
+		player3.setStrategy(new LargestAlphaStrategy());
+		players.add(player3);
+
+		Board board = adminTreeInspector.init(players);
+		players = Game.getInstance().getGame(board);
 		gameTreeExecutor = new GameTreeExecutorImpl();
 		gameTreeExecutor.setUpIterator(players);
 		StateClient stateClient = gameTreeExecutor.setupTree();
 
 		for (Player player : players)
 			stateClient.getState().setPlayerList(player, player.getTile());
-		gameTreeExecutor.playGame(adminTreeInspector, stateClient,
+		gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
 				playerTreeInspector);
 
 	}
 
 	@Override
-	public void playGame(AdminTreeInspector adminTreeInspector,
+	public void playGame(Board board, AdminTreeInspector adminTreeInspector,
 			StateClient stateClient, PlayerTreeInspector playerTreeInspector) {
 		root = stateClient;
 		while (true) {
@@ -94,31 +94,33 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			for (Tile tile : tiles) {
 				Map<String, Object> result = root.generate(root.getState()
 						.getBoard(), tile.getRow(), tile.getColumn());
-				
+
 				StateClient child = new StateClient();
 				child.setMove(result.get("move").toString());
 
 				child.setTile((Tile) result.get("tile"));
 				root.getChildren().add(child);
 			}
-			
+
 			StateClient state = playerTreeInspector.pickState(root,
 					root.getPlayer());
-			if (state == null) break;
-			if (isEnd()) break;
-//			System.out.println(state.getMove());
-//			System.out.println(state.getTile().getColumn()
-//					+ state.getTile().getRow());
+			if (state == null)
+				break;
+			if (isEnd())
+				break;
+			// System.out.println(state.getMove());
+			// System.out.println(state.getTile().getColumn()
+			// + state.getTile().getRow());
 			adminTreeInspector.place(state.getTile(), state.getMove(), state,
 					this.root.getPlayer());
 			root.getState().setShareCombinations();
 			state.getState().setHotels(getHotels());
 			root = state;
-			rotate();
+			rotate(board);
 		}
-		
-		List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
-		String winner = adminTreeInspector.getWinner();
+
+		List<Player> playersFinalScore = Game.getInstance().getGame(board);
+		String winner = adminTreeInspector.getWinner(board);
 		System.out.println("The winner is " + winner);
 	}
 
@@ -129,12 +131,12 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	}
 
 	@Override
-	public void rotate() {
+	public void rotate(Board board) {
 		if (playerIterator.hasNext()) {
 			currentPlayer = playerIterator.next();
 		} else {
 			playerIterator = Game.getInstance()
-					.getGame(BoardFactory.getBoard()).iterator();
+					.getGame(board).iterator();
 			currentPlayer = playerIterator.next();
 		}
 	}

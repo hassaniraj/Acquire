@@ -24,10 +24,7 @@ public class Board {
 	}
 	
 	public static Board getInstance() {
-		if(b == null) {
-			b = new Board();
-		}
-		return b;
+		return new Board();
 	}
 	
 	public Board createBoard() {

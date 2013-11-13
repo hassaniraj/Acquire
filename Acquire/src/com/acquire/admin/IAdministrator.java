@@ -113,8 +113,8 @@ public class IAdministrator implements Administrator {
 			List<String> h = new ArrayList<String>(hotelList.keySet());
 			Set<String> acquired = acquireActions.merging(board,tile.getRow(), tile.getColumn(), h.get(0));
 			if (acquired.size() > 1) {
-				setBonus(acquired);
-				sell(acquired);
+				setBonus(board, acquired);
+				sell(board, acquired);
 			}
 			player.removeTile(tile);
 		} else {
@@ -318,8 +318,8 @@ public class IAdministrator implements Administrator {
 	 * 
 	 * @param acquired
 	 */
-	public void setBonus(Set<String> acquired) {
-		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+	public void setBonus(Board board, Set<String> acquired) {
+		List<Player> players = Game.getInstance().getGame(board);
 		List<String> hotels = new ArrayList<>(acquired);
 		hotels.remove(0);
 		setPlayersContainingShares(hotels, players);
@@ -412,10 +412,10 @@ public class IAdministrator implements Administrator {
 	 * @param acquired
 	 */
 	@Override
-	public void sell(Set<String> acquired) {
+	public void sell(Board board, Set<String> acquired) {
 		List<String> hotels = new ArrayList<>(acquired);
 		hotels.remove(0);
-		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		List<Player> players = Game.getInstance().getGame(board);
 		for (String hotel : hotels) {
 			for (Player player : players) {
 				if (player.getShares().containsKey(hotel)) {

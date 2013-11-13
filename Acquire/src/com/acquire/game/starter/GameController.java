@@ -58,7 +58,7 @@ public class GameController {
 				player3.setStrategy(new LargestAlphaStrategy());
 				players.add(player3);
 
-				adminController.init(players);
+				Board board = adminController.init(players);
 				while (true) {
 					Player player = adminController.getCurrent();
 					List<Object> response = playerController.playPlace(player,
@@ -83,7 +83,7 @@ public class GameController {
 				}
 				
 				//System.out.println(adminController.getWinner());
-				List<Player> playersFinalScore = Game.getInstance().getGame(BoardFactory.getBoard());
+				List<Player> playersFinalScore = Game.getInstance().getGame(board);
 				String winner = adminController.getWinner();
 				for (Player p: playersFinalScore) 
 					System.out.println(p.getName()+ " : " + p.getCash());

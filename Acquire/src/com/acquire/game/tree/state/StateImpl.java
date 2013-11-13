@@ -18,7 +18,7 @@ import com.acquire.player.Player;
 import com.acquire.player.Share;
 
 public class StateImpl implements State {
-	private Board board = BoardFactory.getBoard();
+	private Board board;
 	private List<String> hotels = new ArrayList<>();
 	private Map<Player, List<Tile>> players = new HashMap<>();
 	private String move;

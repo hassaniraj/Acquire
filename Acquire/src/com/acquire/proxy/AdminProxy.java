@@ -18,9 +18,9 @@ public class AdminProxy implements AdminController {
 	}
 
 	@Override
-	public Player init(List<Player> players) {
-		Player player = adminController.init(players);
-		return player;
+	public Board init(List<Player> players) {
+		Board board = adminController.init(players);
+		return board;
 	}
 
 	@Override

@@ -73,5 +73,5 @@ public interface Administrator {
 
 	void setCash(TreeMap<Integer, List<Player>> playerShareMap, String hotel);
 
-	void sell(Set<String> acquired);
+	void sell(Board board, Set<String> acquired);
 }

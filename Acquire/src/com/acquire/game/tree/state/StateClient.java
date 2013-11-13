@@ -146,50 +146,50 @@ public class StateClient {
 	private List<String> checkNeighbor(String row, String column, Board board) {
 		List<String> positions = new ArrayList<>();
 		List<String> position = new ArrayList<>();
-		int rowIndex = BoardFactory.getBoard().getRows().indexOf(row);
-		int columnIndex = BoardFactory.getBoard().getColumns().indexOf(column);
+		int rowIndex = board.getRows().indexOf(row);
+		int columnIndex = board.getColumns().indexOf(column);
 		if (rowIndex - 1 > 0) {
 			position.add(column
-					+ BoardFactory.getBoard().getRows().get(rowIndex - 1));
+					+ board.getRows().get(rowIndex - 1));
 			if (board.getBoard().get(
 					column
-							+ BoardFactory.getBoard().getRows()
+							+ board.getRows()
 									.get(rowIndex - 1)) != null) {
 				positions.add(column
-						+ BoardFactory.getBoard().getRows().get(rowIndex - 1));
+						+ board.getRows().get(rowIndex - 1));
 			}
 		}
-		if (rowIndex + 1 < BoardFactory.getBoard().getRows().size()) {
+		if (rowIndex + 1 < board.getRows().size()) {
 			position.add(column
-					+ BoardFactory.getBoard().getRows().get(rowIndex + 1));
+					+ board.getRows().get(rowIndex + 1));
 			if (board.getBoard().get(
 					column
-							+ BoardFactory.getBoard().getRows()
+							+ board.getRows()
 									.get(rowIndex + 1)) != null) {
 				positions.add(column
-						+ BoardFactory.getBoard().getRows().get(rowIndex + 1));
+						+ board.getRows().get(rowIndex + 1));
 			}
 		}
 		if (columnIndex - 1 > 0) {
-			position.add(BoardFactory.getBoard().getColumns()
+			position.add(board.getColumns()
 					.get(columnIndex - 1)
 					+ row);
 			if (board.getBoard().get(
-					BoardFactory.getBoard().getColumns().get(columnIndex - 1)
+					board.getColumns().get(columnIndex - 1)
 							+ row) != null) {
-				positions.add(BoardFactory.getBoard().getColumns()
+				positions.add(board.getColumns()
 						.get(columnIndex - 1)
 						+ row);
 			}
 		}
-		if (columnIndex + 1 < BoardFactory.getBoard().getColumns().size()) {
-			position.add(BoardFactory.getBoard().getColumns()
+		if (columnIndex + 1 < board.getColumns().size()) {
+			position.add(board.getColumns()
 					.get(columnIndex + 1)
 					+ row);
 			if (board.getBoard().get(
-					BoardFactory.getBoard().getColumns().get(columnIndex + 1)
+					board.getColumns().get(columnIndex + 1)
 							+ row) != null) {
-				positions.add(BoardFactory.getBoard().getColumns()
+				positions.add(board.getColumns()
 						.get(columnIndex + 1)
 						+ row);
 			}

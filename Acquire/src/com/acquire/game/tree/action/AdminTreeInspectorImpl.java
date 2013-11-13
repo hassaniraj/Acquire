@@ -16,10 +16,10 @@ public class AdminTreeInspectorImpl implements AdminTreeInspector {
 	Administrator admin;
 	
 	@Override
-	public List<Player> init(List<Player> players) {
+	public Board init(List<Player> players) {
 		admin = IAdministrator.getInstance();
-		admin.startGame(Game.getInstance(), players);
-		return players;
+		Board board = admin.startGame(Game.getInstance(), players);
+		return board;
 	}
 
 	@Override 
@@ -33,9 +33,9 @@ public class AdminTreeInspectorImpl implements AdminTreeInspector {
 	}
 	
 	@Override
-	public String getWinner() {
+	public String getWinner(Board board) {
 		TreeMap<Integer,Player> playerCash=new TreeMap<>(Collections.reverseOrder());
-		List<Player> players = Game.getInstance().getGame(Board.getInstance());
+		List<Player> players = Game.getInstance().getGame(board);
 		
 		for (Player player : players) {
 			int finalWorth = admin.getWorth(player);
