@@ -13,7 +13,6 @@ import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
-import com.acquire.factory.BoardFactory;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.strategy.LargestAlphaStrategy;
@@ -25,6 +24,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	private static Iterator<Player> playerIterator;
 	private Player currentPlayer;
 	private StateClient root;
+	private List<Player> playersList;
 
 	@Override
 	public void generate() {
@@ -81,7 +81,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		for (Player player : players)
 			stateClient.getState().setPlayerList(player, player.getTile());
 		
-		gameTreeExecutor.generateTree(board, stateClient);
+		stateClient = gameTreeExecutor.generateTree(board, stateClient, players);
 		gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
 				playerTreeInspector);
 
@@ -90,21 +90,23 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	@Override
 	public void playGame(Board board, AdminTreeInspector adminTreeInspector,
 			StateClient stateClient, PlayerTreeInspector playerTreeInspector) {
+		playersList = new ArrayList<Player>(Game.getInstance().getGame(board));
 		root = stateClient;
+		
 		while (true) {
-			root.setPlayer(currentPlayer);
-			List<Tile> tiles = root.getState().getPlayers()
-					.get(root.getPlayer());
-			for (Tile tile : tiles) {
-				Map<String, Object> result = root.generate(root.getState()
-						.getBoard(), tile.getRow(), tile.getColumn());
-
-				StateClient child = new StateClient();
-				child.setMove(result.get("move").toString());
-
-				child.setTile((Tile) result.get("tile"));
-				root.getChildren().add(child);
-			}
+//			root.setPlayer(currentPlayer);
+//			List<Tile> tiles = root.getState().getPlayers()
+//					.get(root.getPlayer());
+//			for (Tile tile : tiles) {
+//				Map<String, Object> result = root.generate(root.getState()
+//						.getBoard(), tile.getRow(), tile.getColumn());
+//
+//				StateClient child = new StateClient();
+//				child.setMove(result.get("move").toString());
+//
+//				child.setTile((Tile) result.get("tile"));
+//				root.getChildren().add(child);
+//			}
 
 			StateClient state = playerTreeInspector.pickState(root,
 					root.getPlayer());
@@ -117,10 +119,12 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			// + state.getTile().getRow());
 			adminTreeInspector.place(state.getTile(), state.getMove(), state,
 					this.root.getPlayer());
+			System.out.println("Tile placed:" + state.getTile().getColumn() + state.getTile().getRow());
 			root.getState().setShareCombinations();
 			state.getState().setHotels(getHotels());
 			root = state;
-			rotate(board);
+			root = generateTree(root.getState().getBoard(), root, playersList);
+			rotate(root.getState().getBoard());
 		}
 
 		List<Player> playersFinalScore = Game.getInstance().getGame(board);
@@ -136,13 +140,9 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 
 	@Override
 	public void rotate(Board board) {
-		if (playerIterator.hasNext()) {
-			currentPlayer = playerIterator.next();
-		} else {
-			playerIterator = Game.getInstance()
-					.getGame(board).iterator();
-			currentPlayer = playerIterator.next();
-		}
+		playersList.remove(0);
+		playersList.add(currentPlayer);
+		currentPlayer = playersList.get(0);
 	}
 
 	@Override
@@ -177,28 +177,41 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	}
 	
 	@Override
-	public void generateTree(Board board,
-			StateClient stateClient) {
+	public StateClient generateTree(Board board,
+			StateClient stateClient, List<Player> players) {
 		root = stateClient;
 		StateClient state = root;
 		root.setPath(new ArrayList<String>());
 		
-		List<Player> players = Game.getInstance().getGame(board);
-		generateChildren(state, players, 0);
+		//List<Player> players = Game.getInstance().getGame(board);
+		root = generateChildren(state, players, 0);
+		return root;
 		//for (int i = 0; i < players.size(); i++) {
 			
 		//}
 	}
 	
 	@Override
-	public void generateChildren(StateClient state, List<Player> players, int playerCount) {
+	public StateClient generateChildren(StateClient state, List<Player> players, int playerCount) {
+		if (playerCount == 4) { return state;}
 		state.setPlayer(players.get(playerCount));
+		
 		List<Tile> tiles = state.getState().getPlayers()
 				.get(state.getPlayer());
+		
+		for(Tile tile: tiles){
+//			System.out.print(tile.getColumn()+tile.getRow() + " ");
+		}
+		
+		//playerCount++;
 		for (Tile tile : tiles) {
+			if (!state.getPath().contains(tile.getTileLabel(tile.getRow(), tile.getColumn()))){
+//			System.out.println("\nPlayer " + playerCount);
+//			
+//			System.out.println("Current tile: " + tile.getColumn() + tile.getRow());
 			Map<String, Object> result = state.generate(state.getState()
 					.getBoard(), tile.getRow(), tile.getColumn());
-
+			
 			StateClient child = new StateClient();
 			child.setMove(result.get("move").toString());
 
@@ -210,11 +223,12 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			else 
 				newPath.add("root");
 			child.setPath(newPath);
-			System.out.println(child.getPath());
-			if (playerCount == 3) return;
-			generateChildren(child, players, ++playerCount);
+//			System.out.println(child.getPath());
 			
-			
+			generateChildren(child, players, playerCount+1);
+//			System.out.println("\nPlayer Count:"+playerCount);
+			}
 		}
+		return state;
 	}
 }

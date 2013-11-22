@@ -57,10 +57,11 @@ public interface GameTreeExecutor {
 	 */
 	List<String> getHotels();
 
-	void generateTree(Board board, StateClient stateClient);
-
-	void generateChildren(StateClient state, List<Player> players,
+	StateClient generateChildren(StateClient state, List<Player> players,
 			int playerCount);
+
+	StateClient generateTree(Board board, StateClient stateClient,
+			List<Player> players);
 
 	
 }
