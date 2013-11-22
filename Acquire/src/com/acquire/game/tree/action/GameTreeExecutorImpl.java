@@ -75,9 +75,13 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		gameTreeExecutor = new GameTreeExecutorImpl();
 		gameTreeExecutor.setUpIterator(players);
 		StateClient stateClient = gameTreeExecutor.setupTree();
+		
+		
 
 		for (Player player : players)
 			stateClient.getState().setPlayerList(player, player.getTile());
+		
+		gameTreeExecutor.generateTree(board, stateClient);
 		gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
 				playerTreeInspector);
 
@@ -170,5 +174,47 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		List<String> available = new ArrayList<>(Labels.getLabels());
 		available.removeAll(hotels);
 		return available;
+	}
+	
+	@Override
+	public void generateTree(Board board,
+			StateClient stateClient) {
+		root = stateClient;
+		StateClient state = root;
+		root.setPath(new ArrayList<String>());
+		
+		List<Player> players = Game.getInstance().getGame(board);
+		generateChildren(state, players, 0);
+		//for (int i = 0; i < players.size(); i++) {
+			
+		//}
+	}
+	
+	@Override
+	public void generateChildren(StateClient state, List<Player> players, int playerCount) {
+		state.setPlayer(players.get(playerCount));
+		List<Tile> tiles = state.getState().getPlayers()
+				.get(state.getPlayer());
+		for (Tile tile : tiles) {
+			Map<String, Object> result = state.generate(state.getState()
+					.getBoard(), tile.getRow(), tile.getColumn());
+
+			StateClient child = new StateClient();
+			child.setMove(result.get("move").toString());
+
+			child.setTile((Tile) result.get("tile"));
+			state.getChildren().add(child);
+			List<String> newPath = new ArrayList<>(state.getPath());
+			if (state.getTile()!= null) 
+			newPath.add(state.getTile().getTileLabel(state.getTile().getRow(), state.getTile().getColumn()));
+			else 
+				newPath.add("root");
+			child.setPath(newPath);
+			System.out.println(child.getPath());
+			if (playerCount == 3) return;
+			generateChildren(child, players, ++playerCount);
+			
+			
+		}
 	}
 }

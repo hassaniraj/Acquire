@@ -50,6 +50,20 @@ public class StateClient {
 	public void setShares(List<String> shares) {
 		this.shares = shares;
 	}
+	
+	/**
+	 * Path to this state
+	 */
+	private List<String> path;
+
+	public List<String> getPath() {
+		if (path == null) path = new ArrayList<>();
+		return path;
+	}
+
+	public void setPath(List<String> path) {
+		this.path = path;
+	}
 
 	/**
 	 * List of all children
