@@ -11,11 +11,11 @@ import java.util.TreeMap;
 import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Game;
-import com.acquire.board.Hotel;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
+import com.acquire.player.strategy.LargestAlphaStrategy;
 import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
@@ -26,7 +26,8 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	private StateClient root;
 	private List<Player> playersList;
 	private List<Tile> allTiles;
-
+	
+	
 	@Override
 	public void generate() {
 		// TODO Auto-generated method stub
@@ -66,11 +67,11 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		player4.setStrategy(new SmallestAntiStrategy());
 		players.add(player4);
 
-		// Player player3 = new Player();
-		// player3.setName("largest-alpha");
-		// player3.setStrategy(new LargestAlphaStrategy());
-		// players.add(player3);
-		
+		Player player3 = new Player();
+		player3.setName("largest-alpha");
+		player3.setStrategy(new LargestAlphaStrategy());
+		players.add(player3);
+
 		Board board = adminTreeInspector.init(players);
 		players = Game.getInstance().getGame(board);
 		gameTreeExecutor = new GameTreeExecutorImpl();
@@ -81,8 +82,8 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		for (Player player : players)
 			stateClient.getState().setPlayerList(player, player.getTile());
 
-		stateClient = gameTreeExecutor
-				.generateTree(board, stateClient, players, adminTreeInspector.emptyTiles());
+		stateClient = gameTreeExecutor.generateTree(board, stateClient,
+				players, adminTreeInspector.emptyTiles());
 		gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
 				playerTreeInspector);
 
@@ -93,7 +94,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			StateClient stateClient, PlayerTreeInspector playerTreeInspector) {
 		playersList = new ArrayList<Player>(Game.getInstance().getGame(board));
 		root = stateClient;
-//		List<Tile> tiles = root.getNextPlayer().getTile();
+		// List<Tile> tiles = root.getNextPlayer().getTile();
 		int i = 0;
 		while (true) {
 			System.out.println(i++);
@@ -140,7 +141,8 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			state.getState().setHotels(getHotels());
 			// root = state;
 			rotate(root.getState().getBoard());
-			root = generateTree(state.getState().getBoard(), state, playersList, adminTreeInspector.emptyTiles());
+			root = generateTree(state.getState().getBoard(), state,
+					playersList, adminTreeInspector.emptyTiles());
 
 		}
 
@@ -219,13 +221,13 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		}
 
 		state.setNextPlayer(players.get(playerCount));
-
+		state.setChildren(new ArrayList<StateClient>());
 		List<Tile> tiles = state.getState().getPlayers()
 				.get(state.getNextPlayer());
 
-//		for (Tile tile : tiles) {
-			// System.out.print(tile.getColumn()+tile.getRow() + " ");
-//		}
+		// for (Tile tile : tiles) {
+		// System.out.print(tile.getColumn()+tile.getRow() + " ");
+		// }
 
 		// playerCount++;
 		if (playerCount < 1) {
@@ -256,14 +258,16 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 					child.setPath(newPath);
 					// System.out.println(child.getPath());
 
-					generateChildren(child, players, playerCount + 1, remainingTiles);
+					generateChildren(child, players, playerCount + 1,
+							remainingTiles);
 					// System.out.println("\nPlayer Count:"+playerCount);
 				}
 			}
 		} else {
-			List<Tile >remaining = getAllTiles(state.getState().getBoard(), state.getNextPlayer().getTile());
+			List<Tile> remaining = getAllTiles(state.getState().getBoard(),
+					state.getNextPlayer().getTile());
 			for (Tile tile : remaining) {
-				
+
 				if (!state.getPath().contains(
 						tile.getTileLabel(tile.getRow(), tile.getColumn()))) {
 					// System.out.println("\nPlayer " + playerCount);
@@ -290,49 +294,84 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 					child.setPath(newPath);
 					// System.out.println(child.getPath());
 
-					generateChildren(child, players, playerCount + 1, remainingTiles);
+					generateChildren(child, players, playerCount + 1,
+							remainingTiles);
 					// System.out.println("\nPlayer Count:"+playerCount);
 				}
 			}
 		}
 		return state;
 	}
-	
+
 	@Override
-	
 	public List<Tile> getAllTiles(Board board, List<Tile> playerTiles) {
 		List<Tile> allTilesClone = new ArrayList<>(allTiles);
 		List<Tile> boardTiles = new ArrayList<Tile>();
-		for (String tile: board.getOccupiedTiles().keySet()) {
+		for (String tile : board.getOccupiedTiles().keySet()) {
 			Tile t = new Tile();
 			t.setTileLabel(tile);
 			boardTiles.add(t);
 		}
-		
-		
-		
-		
-		for (Tile tile: playerTiles) {
-			//System.out.println(tile.getTileLabel(tile.getRow(), tile.getColumn()));
+
+		for (Tile tile : playerTiles) {
+			// System.out.println(tile.getTileLabel(tile.getRow(),
+			// tile.getColumn()));
 			allTilesClone.remove(allTilesClone.indexOf(tile));
 		}
-		
-		for (Tile boardTile: boardTiles) {
+
+		for (Tile boardTile : boardTiles) {
 			allTilesClone.remove(allTilesClone.indexOf(boardTile));
 		}
-		//System.out.println("SIze:" + allTilesClone.size());
+		// System.out.println("SIze:" + allTilesClone.size());
 		return allTilesClone;
 	}
-	
+
 	@Override
 	public void setAllTiles(Board board) {
 		allTiles = new ArrayList<>();
-		for (String col: board.getColumns())
-			for (String row: board.getRows()) {
+		for (String col : board.getColumns())
+			for (String row : board.getRows()) {
 				Tile tile = new Tile();
 				tile.setColumn(col);
 				tile.setRow(row);
 				allTiles.add(tile);
 			}
+	}
+	
+	public Map<StateClient, Integer> minimaxExecute(Board board, StateClient root, boolean MAX) {
+		Map<StateClient, Integer> score = new HashMap<>();
+		score.put(root, -9999999);
+		minimax(board, score, MAX, -9999999);
+		return null;
+	}
+	
+	public Map<StateClient, Integer> minimax(Board board, Map<StateClient, Integer> scoreMap, boolean MAX, int alpha) {
+		StateClient root = scoreMap.keySet().iterator().next();
+		if (root.getNextPlayer() == null) {
+			// return heuristic
+			return null;
+		}
+		if (MAX) {
+			List<StateClient> children = root.getChildren();
+			alpha = -9999999;
+			for(StateClient child: children) {
+				Map<StateClient, Integer> nextScore = new HashMap<>();
+				nextScore.put(child, alpha);
+				Map<StateClient, Integer> value = minimax(board, nextScore, !MAX, alpha);
+				alpha = alpha < value.get(child) ? nextScore.put(child, value.get(child)): nextScore.put(child, alpha);
+				return nextScore;
+			}
+		} else if (!MAX) {
+			List<StateClient> children = root.getChildren();
+			alpha = 9999999;
+			for(StateClient child: children) {
+				Map<StateClient, Integer> nextScore = new HashMap<>();
+				nextScore.put(child, alpha);
+				Map<StateClient, Integer> value = minimax(board, nextScore, !MAX, alpha);
+				alpha = alpha > value.get(child) ? nextScore.put(child, value.get(child)): nextScore.put(child, alpha);
+				return nextScore;
+			}
+		}
+		return null;
 	}
 }
