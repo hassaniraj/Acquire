@@ -16,6 +16,7 @@ import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
+import com.acquire.player.Share;
 import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
@@ -335,4 +336,53 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 				allTiles.add(tile);
 			}
 	}
+	
+	
+	public List<Player> evaluationOnWorth(List<Player> players){
+		for(Player player: players){
+			Map<String, Integer> playerShares = player.getShares();
+			int cash = player.getCash();
+			int	worthOfAPlayer=0;
+			for (Map.Entry<String, Integer> playerSharesEntry : playerShares
+					.entrySet()) {
+				String label = playerSharesEntry.getKey();
+				int numberOfShares = playerSharesEntry.getValue();
+				int sharePrice = Share.getSharePrice(label);
+				worthOfAPlayer+=(sharePrice*numberOfShares);
+			}
+			worthOfAPlayer += cash;
+			player.setPresentWorth(worthOfAPlayer);
+		}
+		return players;
+	}
+	
+	public Player evaluationOnShares(Player player){
+		Map<String,Integer> chainMap=new HashMap<>();
+		Map<String, List<String>> chainLabels = new HashMap<>(Chain.getChain());
+		int max=0;
+		String hotelName="";
+		for (String chain: Chain.getChain().keySet()) {
+			if (Chain.getChain(chain).isEmpty()) chainLabels.remove(chain);
+		}
+		for(Map.Entry<String, List<String>> entry:chainLabels.entrySet()){
+			int count=entry.getValue().size();
+			chainMap.put(entry.getKey(), count);
+		}
+		for(Map.Entry<String, Integer> entry:chainMap.entrySet()){
+			if(entry.getValue()>max){
+				max=entry.getValue();
+				hotelName=entry.getKey();
+			}
+		}
+		if(player.getShares().containsKey(hotelName)){
+			int score=player.getShare(hotelName);
+			player.setScore(score);
+			
+		}
+		else{
+			player.setScore(0);
+		}
+		return player;
+	}
+	
 }

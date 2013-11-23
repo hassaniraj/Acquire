@@ -14,9 +14,29 @@ public class Player {
 	private Map <String, Integer> share;
 	private List<Tile> tiles;
 	private PlayerStrategy strategy;
+	private int presentWorth;
+	private int score;
 	
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
+	public int getPresentWorth() {
+		return presentWorth;
+	}
+
+	public void setPresentWorth(int presentWorth) {
+		this.presentWorth = presentWorth;
+	}
+
 	public Player() {
 		this.cash = 0;
+		this.score=0;
+		this.presentWorth=cash;
 		share = new HashMap<>();
 		tiles = new ArrayList<>();
 	}
