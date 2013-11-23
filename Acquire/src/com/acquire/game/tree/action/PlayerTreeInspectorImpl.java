@@ -13,7 +13,7 @@ public class PlayerTreeInspectorImpl implements PlayerTreeInspector {
 	@Override
 	public StateClient pickState(StateClient root, Player player) {
 		List <StateClient> children = root.getChildren();
-		StateClient state = player.getStrategy().playTile(children);
+		StateClient state = player.getStrategy().playTile(root, children);
 		if (state != null) {
 		List<String> shares = player.getStrategy().buyShare(state, root.getState().getShareCombinations());
 		state.setShares(shares);

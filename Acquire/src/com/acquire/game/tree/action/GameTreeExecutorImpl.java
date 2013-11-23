@@ -16,6 +16,9 @@ import com.acquire.board.Tile;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.strategy.LargestAlphaStrategy;
+import com.acquire.player.Share;
+import com.acquire.player.strategy.MaximumSharesStrategy;
+import com.acquire.player.strategy.MaximumWorthStrategy;
 import com.acquire.player.strategy.RandomPlayerStrategy;
 import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
@@ -26,8 +29,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	private StateClient root;
 	private List<Player> playersList;
 	private List<Tile> allTiles;
-	
-	
+
 	@Override
 	public void generate() {
 		// TODO Auto-generated method stub
@@ -46,46 +48,66 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 	}
 
 	public static void main(String[] args) {
-
+		Map<String, Integer> results = new HashMap<>();
+		
+		results.put("random1", 0);
+		results.put("random2", 0);
+		results.put("worth", 0);
+		results.put("shares", 0);
+		
 		AdminTreeInspector adminTreeInspector = new AdminTreeInspectorImpl();
 		GameTreeExecutor gameTreeExecutor = new GameTreeExecutorImpl();
 		PlayerTreeInspector playerTreeInspector = new PlayerTreeInspectorImpl();
+		for (int i = 0; i < 1000; i++) {
+			List<Player> players = new ArrayList<>();
+			
+			Player player1 = new Player();
+			player1.setName("random1");
+			player1.setStrategy(new RandomPlayerStrategy());
+			players.add(player1);
 
-		List<Player> players = new ArrayList<>();
-		Player player1 = new Player();
-		player1.setName("random");
-		player1.setStrategy(new RandomPlayerStrategy());
-		players.add(player1);
+			Player player2 = new Player();
+			player2.setName("random2");
+			player2.setStrategy(new RandomPlayerStrategy());
+			players.add(player2);
+			
+			Player player4 = new Player();
+			player4.setName("shares");
+			player4.setStrategy(new MaximumSharesStrategy());
+			players.add(player4);
+			
+			Player player3 = new Player();
+			player3.setName("worth");
+			player3.setStrategy(new MaximumWorthStrategy());
+			players.add(player3);
 
-		Player player2 = new Player();
-		player2.setName("sequential");
-		player2.setStrategy(new SequentialPlayerStrategy());
-		players.add(player2);
+			Board board = adminTreeInspector.init(players);
+			players = Game.getInstance().getGame(board);
+			gameTreeExecutor = new GameTreeExecutorImpl();
+			gameTreeExecutor.setUpIterator(players);
+			gameTreeExecutor.setAllTiles(board);
+			StateClient stateClient = gameTreeExecutor.setupTree();
 
-		Player player4 = new Player();
-		player4.setName("smallest-anti");
-		player4.setStrategy(new SmallestAntiStrategy());
-		players.add(player4);
+			for (Player player : players)
+				stateClient.getState().setPlayerList(player, player.getTile());
 
-		Player player3 = new Player();
-		player3.setName("largest-alpha");
-		player3.setStrategy(new LargestAlphaStrategy());
-		players.add(player3);
+			stateClient = gameTreeExecutor.generateTree(board, stateClient,
+					players, adminTreeInspector.emptyTiles());
+			gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
+					playerTreeInspector);
 
-		Board board = adminTreeInspector.init(players);
-		players = Game.getInstance().getGame(board);
-		gameTreeExecutor = new GameTreeExecutorImpl();
-		gameTreeExecutor.setUpIterator(players);
-		gameTreeExecutor.setAllTiles(board);
-		StateClient stateClient = gameTreeExecutor.setupTree();
+			// System.out.println(adminController.getWinner());
+			// List<Player> playersFinalScore =
+			 Game.getInstance().getGame(board);
+			String winner = adminTreeInspector.getWinner(board);
+			results.put(winner, results.get(winner) + 1);
+			// System.out.println("Game ended! ");
 
-		for (Player player : players)
-			stateClient.getState().setPlayerList(player, player.getTile());
+		}
+		// if (results.get(adminController.getWinner()) != null)
+		// current += results.get(adminController.getWinner());
 
-		stateClient = gameTreeExecutor.generateTree(board, stateClient,
-				players, adminTreeInspector.emptyTiles());
-		gameTreeExecutor.playGame(board, adminTreeInspector, stateClient,
-				playerTreeInspector);
+		System.out.println("Final Stats: " + results);
 
 	}
 
@@ -337,15 +359,17 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 				allTiles.add(tile);
 			}
 	}
-	
-	public Map<StateClient, Integer> minimaxExecute(Board board, StateClient root, boolean MAX) {
+
+	public Map<StateClient, Integer> minimaxExecute(Board board,
+			StateClient root, boolean MAX) {
 		Map<StateClient, Integer> score = new HashMap<>();
 		score.put(root, -9999999);
 		minimax(board, score, MAX, -9999999);
 		return null;
 	}
-	
-	public Map<StateClient, Integer> minimax(Board board, Map<StateClient, Integer> scoreMap, boolean MAX, int alpha) {
+
+	public Map<StateClient, Integer> minimax(Board board,
+			Map<StateClient, Integer> scoreMap, boolean MAX, int alpha) {
 		StateClient root = scoreMap.keySet().iterator().next();
 		if (root.getNextPlayer() == null) {
 			// return heuristic
@@ -354,24 +378,76 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		if (MAX) {
 			List<StateClient> children = root.getChildren();
 			alpha = -9999999;
-			for(StateClient child: children) {
+			for (StateClient child : children) {
 				Map<StateClient, Integer> nextScore = new HashMap<>();
 				nextScore.put(child, alpha);
-				Map<StateClient, Integer> value = minimax(board, nextScore, !MAX, alpha);
-				alpha = alpha < value.get(child) ? nextScore.put(child, value.get(child)): nextScore.put(child, alpha);
+				Map<StateClient, Integer> value = minimax(board, nextScore,
+						!MAX, alpha);
+				alpha = alpha < value.get(child) ? nextScore.put(child,
+						value.get(child)) : nextScore.put(child, alpha);
 				return nextScore;
 			}
 		} else if (!MAX) {
 			List<StateClient> children = root.getChildren();
 			alpha = 9999999;
-			for(StateClient child: children) {
+			for (StateClient child : children) {
 				Map<StateClient, Integer> nextScore = new HashMap<>();
 				nextScore.put(child, alpha);
-				Map<StateClient, Integer> value = minimax(board, nextScore, !MAX, alpha);
-				alpha = alpha > value.get(child) ? nextScore.put(child, value.get(child)): nextScore.put(child, alpha);
+				Map<StateClient, Integer> value = minimax(board, nextScore,
+						!MAX, alpha);
+				alpha = alpha > value.get(child) ? nextScore.put(child,
+						value.get(child)) : nextScore.put(child, alpha);
 				return nextScore;
 			}
 		}
 		return null;
 	}
+
+	public List<Player> evaluationOnWorth(List<Player> players) {
+		for (Player player : players) {
+			Map<String, Integer> playerShares = player.getShares();
+			int cash = player.getCash();
+			int worthOfAPlayer = 0;
+			for (Map.Entry<String, Integer> playerSharesEntry : playerShares
+					.entrySet()) {
+				String label = playerSharesEntry.getKey();
+				int numberOfShares = playerSharesEntry.getValue();
+				int sharePrice = Share.getSharePrice(label);
+				worthOfAPlayer += (sharePrice * numberOfShares);
+			}
+			worthOfAPlayer += cash;
+			player.setPresentWorth(worthOfAPlayer);
+		}
+		return players;
+	}
+
+	public Player evaluationOnShares(Player player) {
+		Map<String, Integer> chainMap = new HashMap<>();
+		Map<String, List<String>> chainLabels = new HashMap<>(Chain.getChain());
+		int max = 0;
+		String hotelName = "";
+		for (String chain : Chain.getChain().keySet()) {
+			if (Chain.getChain(chain).isEmpty())
+				chainLabels.remove(chain);
+		}
+		for (Map.Entry<String, List<String>> entry : chainLabels.entrySet()) {
+			int count = entry.getValue().size();
+			chainMap.put(entry.getKey(), count);
+		}
+		for (Map.Entry<String, Integer> entry : chainMap.entrySet()) {
+			if (entry.getValue() > max) {
+				max = entry.getValue();
+				hotelName = entry.getKey();
+			}
+		}
+		if (player.getShares().containsKey(hotelName)) {
+			int score = player.getShare(hotelName);
+			player.setScore(score);
+
+		} else {
+			player.setScore(0);
+		}
+		return player;
+	}
+
 }

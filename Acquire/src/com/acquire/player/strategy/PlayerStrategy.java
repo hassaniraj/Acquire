@@ -29,7 +29,7 @@ public interface PlayerStrategy {
 	 * @param children
 	 * @return
 	 */
-	StateClient playTile(List<StateClient> children);
+	//StateClient playTile(List<StateClient> children);
 	
 	/**
 	 * Buy share using game tree
@@ -38,4 +38,6 @@ public interface PlayerStrategy {
 	 * @return
 	 */
 	List<String> buyShare(StateClient stateClient, Set<List<String>> shareCombinations);
+
+	StateClient playTile(StateClient root, List<StateClient> children);
 }

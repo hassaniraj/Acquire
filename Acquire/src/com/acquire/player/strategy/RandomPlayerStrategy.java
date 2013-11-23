@@ -81,7 +81,7 @@ public class RandomPlayerStrategy implements PlayerStrategy {
 	}
 
 	@Override
-	public StateClient playTile(List<StateClient> children) {
+	public StateClient playTile(StateClient root, List<StateClient> children) {
 		// Administrator administrator = IAdministrator.getInstance();
 		// Board board = BoardFactory.getBoard();
 		// administrator.setCurrentPlayer(player);

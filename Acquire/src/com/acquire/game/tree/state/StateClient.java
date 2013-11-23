@@ -17,6 +17,16 @@ import com.acquire.player.Player;
  * 
  */
 public class StateClient {
+	private int score;
+	
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score = score;
+	}
+
 	private Player player;
 
 	public Player getPlayer() {
