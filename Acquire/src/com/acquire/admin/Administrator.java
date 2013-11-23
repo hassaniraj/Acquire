@@ -74,4 +74,6 @@ public interface Administrator {
 	void setCash(TreeMap<Integer, List<Player>> playerShareMap, String hotel);
 
 	void sell(Board board, Set<String> acquired);
+
+	List<String> getEmptyTiles();
 }

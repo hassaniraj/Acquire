@@ -3,6 +3,7 @@ package com.acquire.game.tree.action;
 import java.util.List;
 
 import com.acquire.board.Board;
+import com.acquire.board.Tile;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 
@@ -58,10 +59,14 @@ public interface GameTreeExecutor {
 	List<String> getHotels();
 
 	StateClient generateChildren(StateClient state, List<Player> players,
-			int playerCount);
+			int playerCount, List<String> remainingTiles);
 
 	StateClient generateTree(Board board, StateClient stateClient,
-			List<Player> players);
+			List<Player> players, List<String> remainingTiles);
+
+	void setAllTiles(Board board);
+
+	List<Tile> getAllTiles(Board board, List<Tile> playerTiles);
 
 	
 }

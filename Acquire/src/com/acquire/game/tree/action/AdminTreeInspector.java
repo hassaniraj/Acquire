@@ -30,4 +30,6 @@ public interface AdminTreeInspector {
 	 * @return
 	 */
 	String getWinner(Board board);
+
+	List<String> emptyTiles();
 }

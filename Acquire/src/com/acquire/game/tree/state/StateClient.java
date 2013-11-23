@@ -28,6 +28,16 @@ public class StateClient {
 	public void setPlayer(Player player) {
 		this.player = player;
 	}
+	
+	private Player nextPlayer;
+
+	public Player getNextPlayer() {
+		return nextPlayer;
+	}
+
+	public void setNextPlayer(Player nextPlayer) {
+		this.nextPlayer = nextPlayer;
+	}
 
 	private String hotel;
 

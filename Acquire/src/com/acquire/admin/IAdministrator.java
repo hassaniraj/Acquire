@@ -48,12 +48,14 @@ public class IAdministrator implements Administrator {
 
 	@Override
 	public void setAllTiles(Board board) {
-
+		System.out.println(board.getColumns());
+		System.out.println(board.getRows());
 		for (String column : board.getColumns()) {
 			for (String row : board.getRows()) {
 				allTiles.add(new Tile().getTileLabel(row, column));
 			}
 		}
+		System.out.println(allTiles.size());
 	}
 
 	@Override
@@ -70,8 +72,9 @@ public class IAdministrator implements Administrator {
 		new Chain();
 		for (Player player : players) {
 			for (int i = 0; i < 6; i++) {
-				if (pickTiles() != null) {
-					String tile = pickTiles();
+				String t = pickTiles();
+				if (t != null) {
+					String tile = t;
 					player.setTile(tile.substring(tile.length() - 1),
 							tile.substring(0, tile.length() - 1));
 				}
@@ -95,19 +98,25 @@ public class IAdministrator implements Administrator {
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
 		String type = acquireActions.inspect(board, tile.getRow(), tile.getColumn());
+		if (type.equals("merging")) {
+			System.out.println("merging case");
+		}
 		if (type.equals(Config.Moves.SINGLETON.getMove())) {
 			acquireActions.singleton(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
+			return type;
 		} else if (type.equals(Config.Moves.GROWING.getMove())) {
 			acquireActions.growing(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
+			return type;
 		} else if (label != null) {
 			if (type.equals(Config.Moves.FOUNDING.getMove()) && !label.equals("")) {
 			acquireActions.founding(board, tile.getRow(), tile.getColumn(), label);
 			player.setShare(label, player.getShare(label) + 1);
 			Share.setShare(label, Share.getShare(label) - 1);
 			player.removeTile(tile);
-			}
+			return type;
+		
 		} else if (type.equals(Config.Moves.MERGING.getMove())) {
 			Map<String, List<String>> hotelList = acquireActions.getLabel(
 					board, tile.getRow(), tile.getColumn());
@@ -118,21 +127,23 @@ public class IAdministrator implements Administrator {
 				sell(board, acquired);
 			}
 			player.removeTile(tile);
-		} else {
+			return type;
+		}} else {
 			Hotel hotel = new Hotel();
 			hotel.setLabel(Config.Moves.SINGLETON.getMove());
 			board.getBoard().put(tile.getColumn() + tile.getRow(), hotel);
 			player.removeTile(tile);
+			return Config.Moves.SINGLETON.getMove();
 		}
-		
-		return type;
+		System.out.println("No match");
+		return null;
 	}
 
-//	@Override
-//	public List<String> getEmptyTiles() {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
+	@Override
+	public List<String> getEmptyTiles() {
+		// TODO Auto-generated method stub
+		return allTiles;
+	}
 
 	@Override
 	public String pickTiles() {
@@ -262,8 +273,9 @@ public class IAdministrator implements Administrator {
 
 	@Override
 	public void done(Player player, Board board) {
-		if (pickTiles() != null) {
-			String newTile = pickTiles();
+		String tile = pickTiles();
+		if (tile != null) {
+			String newTile = tile;
 			player.setTile(newTile.substring(newTile.length() - 1),
 					newTile.substring(0, newTile.length() - 1));
 		}

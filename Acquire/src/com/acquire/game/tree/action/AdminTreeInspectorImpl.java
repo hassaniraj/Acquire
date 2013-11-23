@@ -30,6 +30,10 @@ public class AdminTreeInspectorImpl implements AdminTreeInspector {
 			admin.getHotelShares(board, player, label);
 		}
 		admin.done(player, board);
+		System.out.println("remaining tiles:" + admin.getEmptyTiles().size());
+//		for (String t: admin.getEmptyTiles()){
+//			System.out.print(t + " ");
+//		}
 	}
 	
 	@Override
@@ -43,5 +47,10 @@ public class AdminTreeInspectorImpl implements AdminTreeInspector {
 			playerCash.put(player.getCash(), player);
 		}
 		return playerCash.firstEntry().getValue().getName();
+	}
+	
+	@Override
+	public List<String> emptyTiles() {
+		return admin.getEmptyTiles();
 	}
 }
