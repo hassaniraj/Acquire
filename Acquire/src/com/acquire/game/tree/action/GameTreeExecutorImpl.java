@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -55,32 +56,40 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		results.put("worth", 0);
 		results.put("shares", 0);
 		
+		
 		AdminTreeInspector adminTreeInspector = new AdminTreeInspectorImpl();
 		GameTreeExecutor gameTreeExecutor = new GameTreeExecutorImpl();
 		PlayerTreeInspector playerTreeInspector = new PlayerTreeInspectorImpl();
-		for (int i = 0; i < 1000; i++) {
-			List<Player> players = new ArrayList<>();
+		for (int i = 0; i < 100; i++) {
+			List<Player> playersList = new ArrayList<>();
 			
 			Player player1 = new Player();
 			player1.setName("random1");
 			player1.setStrategy(new RandomPlayerStrategy());
-			players.add(player1);
+			playersList.add(player1);
 
 			Player player2 = new Player();
 			player2.setName("random2");
 			player2.setStrategy(new RandomPlayerStrategy());
-			players.add(player2);
+			playersList.add(player2);
 			
 			Player player4 = new Player();
 			player4.setName("shares");
 			player4.setStrategy(new MaximumSharesStrategy());
-			players.add(player4);
+			playersList.add(player4);
 			
 			Player player3 = new Player();
 			player3.setName("worth");
 			player3.setStrategy(new MaximumWorthStrategy());
-			players.add(player3);
-
+			playersList.add(player3);
+			List<Player> players=new ArrayList<>();
+			Random random=new Random();
+			int size=playersList.size();
+			for(int j=0;j<size;j++){
+				int index=random.nextInt(playersList.size());
+				players.add(playersList.remove(index));
+			}
+			System.out.println(players.size());
 			Board board = adminTreeInspector.init(players);
 			players = Game.getInstance().getGame(board);
 			gameTreeExecutor = new GameTreeExecutorImpl();
