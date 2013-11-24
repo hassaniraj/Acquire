@@ -14,6 +14,7 @@ import com.acquire.board.Chain;
 import com.acquire.board.Game;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
+import com.acquire.config.Config;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.strategy.LargestAlphaStrategy;
@@ -60,7 +61,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		AdminTreeInspector adminTreeInspector = new AdminTreeInspectorImpl();
 		GameTreeExecutor gameTreeExecutor = new GameTreeExecutorImpl();
 		PlayerTreeInspector playerTreeInspector = new PlayerTreeInspectorImpl();
-		for (int i = 0; i < 100; i++) {
+		for (int i = 0; i < 1000; i++) {
 			List<Player> playersList = new ArrayList<>();
 			
 			Player player1 = new Player();
@@ -127,7 +128,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		root = stateClient;
 		// List<Tile> tiles = root.getNextPlayer().getTile();
 		int i = 0;
-		while (true) {
+		while (!isEnd()) {
 			System.out.println(i++);
 
 			if (i == 54) {
@@ -203,7 +204,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 				chainLabels.remove(chain);
 		}
 		for (String chainName : chainLabels.keySet()) {
-			if (Chain.getChain(chainName).size() >= 41) {
+			if (Chain.getChain(chainName).size() >= Config.MAX_CHAIN_SIZE) {
 				return true;
 			}
 		}
@@ -213,7 +214,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			chainLabelsSize.put(chainLabels.get(chainName).size(), chainName);
 		}
 		if (!chainLabelsSize.isEmpty())
-			if (chainLabelsSize.keySet().iterator().next() >= 11)
+			if (chainLabelsSize.keySet().iterator().next() >= Config.SAFE_CHAIN_SIZE)
 				return true;
 		return false;
 	}

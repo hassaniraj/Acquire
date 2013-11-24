@@ -188,7 +188,7 @@ public class IAcquireActions implements AcquireActions {
 					}
 				}
 			} else
-				return null;
+				return acquired;
 
 			Hotel hotel = new Hotel();
 			hotel.setLabel(maxLabel);
@@ -226,7 +226,7 @@ public class IAcquireActions implements AcquireActions {
 			
 			return acquired;
 		}
-		return null;
+		return acquired;
 	}
 
 	@Override

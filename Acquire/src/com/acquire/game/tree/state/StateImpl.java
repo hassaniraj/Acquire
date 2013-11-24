@@ -61,7 +61,11 @@ public class StateImpl implements State {
 	@Override
 	public void setShareCombinations() {
 		Map<String, Integer> shareCount = new HashMap<>(Share.getShare());
+		shareCombinations.clear();
 		hotels = new ArrayList<String>(board.getHotelTiles().keySet());
+		System.out.println(hotels);
+		if (Share.getShare("American") == 1)
+			System.out.println("one left");
 		for (int i = 0; i < hotels.size(); i++) {
 			if (shareCount.get(hotels.get(i)) > 0) {
 				shareCombinations.add(new ArrayList<>(Arrays.asList(hotels
@@ -70,21 +74,26 @@ public class StateImpl implements State {
 						.put(hotels.get(i), shareCount.get(hotels.get(i)) - 1);
 			}
 			for (int j = 0; j < hotels.size(); j++) {
-				if (shareCount.get(hotels.get(i)) > 0) {
-					shareCombinations.add(new ArrayList<>(Arrays.asList(
-							hotels.get(i), hotels.get(j))));
-					shareCount.put(hotels.get(i),
-							shareCount.get(hotels.get(i)) - 1);
-				}
-				for (int k = 0; k < hotels.size(); k++) {
-					if (shareCount.get(hotels.get(i)) > 0) {
+				if (shareCount.get(hotels.get(j)) > 0) {
+					
 						shareCombinations.add(new ArrayList<>(Arrays.asList(
-								hotels.get(i), hotels.get(j), hotels.get(k))));
-						shareCount.put(hotels.get(i),
-								shareCount.get(hotels.get(i)) - 1);
+								hotels.get(i), hotels.get(j))));
+						shareCount.put(hotels.get(j),
+								shareCount.get(hotels.get(j)) - 1);
+					}
+				
+				for (int k = 0; k < hotels.size(); k++) {
+					if (shareCount.get(hotels.get(k)) > 2) {
+						
+							shareCombinations.add(new ArrayList<>(Arrays
+									.asList(hotels.get(i), hotels.get(j),
+											hotels.get(k))));
+							shareCount.put(hotels.get(k),
+									shareCount.get(hotels.get(k)) - 1);
+						}
 					}
 				}
-			}
+			
 		}
 		List<List<String>> shares = new ArrayList<>(shareCombinations);
 		Collections.sort(shares, new Comparator<List<String>>() {
@@ -120,10 +129,10 @@ public class StateImpl implements State {
 	}
 
 	public void setup() {
-//		board.clear();
+		// board.clear();
 		board = BoardFactory.getBoard();
 		hotels = new ArrayList<String>(board.getHotelTiles().keySet());
-		
+
 		for (int i = 0; i < hotels.size(); i++) {
 			shareCombinations
 					.add(new ArrayList<>(Arrays.asList(hotels.get(i))));

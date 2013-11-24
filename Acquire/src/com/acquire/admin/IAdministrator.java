@@ -30,8 +30,6 @@ public class IAdministrator implements Administrator {
 	private Iterator<Player> playerIterator;
 	private Player currentPlayer;
 	private static Administrator administrator;
-	private int MAX_CHAIN_SIZE = 41;
-	private int SAFE_CHAIN_SIZE = 11;
 
 	@Override
 	public void initTiles(Random random, List<String> tiles) {
@@ -98,6 +96,10 @@ public class IAdministrator implements Administrator {
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
 		String type = acquireActions.inspect(board, tile.getRow(), tile.getColumn());
+		System.out.println(type);
+		if (type == null) {
+			System.out.println(type);
+		}
 		if (type.equals("merging")) {
 			System.out.println("merging case");
 		}
@@ -295,7 +297,7 @@ public class IAdministrator implements Administrator {
 			if (Chain.getChain(chain).isEmpty()) chainLabels.remove(chain);
 		}
 		for (String chainName: chainLabels.keySet()) {
-			if (Chain.getChain(chainName).size() >= MAX_CHAIN_SIZE) {
+			if (Chain.getChain(chainName).size() >= Config.MAX_CHAIN_SIZE) {
 				return true;
 			}
 		}
@@ -305,7 +307,10 @@ public class IAdministrator implements Administrator {
 			chainLabelsSize.put(chainLabels.get(chainName).size(), chainName);
 		}
 		if (!chainLabelsSize.isEmpty())
-		if (chainLabelsSize.keySet().iterator().next() >= SAFE_CHAIN_SIZE)
+		if (chainLabelsSize.keySet().iterator().next() >= Config.SAFE_CHAIN_SIZE)
+			return true;
+		
+		if (allTiles.isEmpty()) 
 			return true;
 		return false;
 	}
