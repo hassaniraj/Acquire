@@ -13,10 +13,7 @@ import java.net.Socket;
 import com.acquire.exception.AcquireException;
 
 public class GameClient {
-	public static void main(String argv[]) throws AcquireException /*
-																	 * throws
-																	 * Exception
-																	 */{
+	public static void main(String argv[]) throws AcquireException {
 		while (true) {
 			try {
 				// Bind the socket
