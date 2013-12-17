@@ -1,5 +1,6 @@
 package com.acquire.player;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import com.acquire.player.strategy.PlayerStrategy;
 
 public class Player {
 	private String name;
+	private Socket clientID;
 	private int cash;
 	private Map <String, Integer> share;
 	private List<Tile> tiles;
@@ -96,5 +98,13 @@ public class Player {
 	
 	public PlayerStrategy getStrategy() {
 		return this.strategy;
+	}
+
+	public Socket getClientID() {
+		return clientID;
+	}
+
+	public void setClientID(Socket clientID) {
+		this.clientID = clientID;
 	}
 }

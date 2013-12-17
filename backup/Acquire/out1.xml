@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<action hotel1="Continental" hotel2="Festival" hotel3="Festival">
+	<place column="1" hotel="Festival" row="B" />
+</action>

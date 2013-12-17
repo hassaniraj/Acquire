@@ -1,0 +1,141 @@
+package com.acquire.network;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import com.acquire.board.Board;
+import com.acquire.config.Config.Strategy;
+import com.acquire.game.tree.action.AdminTreeInspector;
+import com.acquire.game.tree.action.AdminTreeInspectorImpl;
+import com.acquire.game.tree.action.PlayerTreeInspector;
+import com.acquire.player.Player;
+import com.acquire.request.AdminInputHandler;
+import com.acquire.request.GameHandler;
+
+public class GameServer {
+	private static GameHandler game = new GameHandler();
+	private boolean gameStarted = false;
+	private static int playerCount = 0;
+	private static AdminTreeInspector adminTreeInspector;
+	private static PlayerTreeInspector playerTreeInspector;
+	private static List<Player> players;
+	private static Player currentPlayer;
+	AdminInputHandler adminInputHandler = new AdminInputHandler();
+
+	public static void main(String[] args) throws IOException {
+		GameServer gameServer = new GameServer();
+		players = new ArrayList<>();
+		currentPlayer = new Player();
+		adminTreeInspector = new AdminTreeInspectorImpl();
+		System.out.println("Started game server... waiting for connection... ");
+		class ClientConnection implements Runnable {
+			private Socket client;
+			private GameServer gameServer;
+
+			public ClientConnection(Socket client, GameServer gameServer) {
+				this.client = client;
+				this.gameServer = gameServer;
+			}
+
+			public void run() {
+				if (playerCount == 1) {
+					if (currentPlayer.getClientID() != null
+							&& client == currentPlayer.getClientID()) {
+						System.out.println(currentPlayer.getClientID());
+						BufferedReader inFromClient;
+						try {
+							inFromClient = new BufferedReader(
+									new InputStreamReader(
+											client.getInputStream()));
+							if (playerCount == 4) {
+								DataOutputStream outToClient = new DataOutputStream(
+										client.getOutputStream());
+								
+								while (true) {
+									String clientSentence = inFromClient
+											.readLine();
+									
+									
+									// if (clientSentence != null)
+									// game.processRequest(new
+									// StringBuilder(clientSentence));
+								}
+							}
+						} catch (IOException e) {
+							e.printStackTrace();
+						} 
+					} else if (currentPlayer.getClientID() != null
+							&& client == currentPlayer.getClientID()) {
+						System.out.println("out of turn");
+					}
+				}
+			}
+		}
+		ServerSocket server = null;
+		try {
+			server = new ServerSocket(5432);
+		} catch (IOException e) {
+			System.err.println("Could not listen on port: " + 5432);
+			System.err.println(e);
+			System.exit(1);
+		}
+
+		Socket client = null;
+		while (true) {
+			try {
+				client = server.accept();
+			} catch (IOException e) {
+				System.err.println("Server did not accept client");
+				System.err.println(e);
+				System.exit(1);
+			}
+			if (playerCount < 4) {
+				System.out.println("Connected " + playerCount + " players");
+				playerCount++;
+				Player player = new Player();
+				player.setStrategy(Strategy.RANDOM.getMove());
+				player.setClientID(client);
+				players.add(player);
+				currentPlayer = players.get(0);
+				Thread t = new Thread(new ClientConnection(client, gameServer));
+				t.start();
+			} 
+			if (playerCount == 4) {
+				adminTreeInspector.init(players);
+				currentPlayer = players.get(0);
+				AdminInputHandler adminInputHandler = new AdminInputHandler();
+				try {
+					adminInputHandler.writeResponse(adminTreeInspector, currentPlayer, null, null);
+					DataOutputStream outToClient = new DataOutputStream(
+							currentPlayer.getClientID().getOutputStream());
+					
+				} catch (ParserConfigurationException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (TransformerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		// adminTreeInspector.init(players);
+		// currentPlayer = players.get(0);
+		// System.out.println("initialzed");
+	}
+
+	public void rotate(Board board) {
+		players.remove(0);
+		players.add(currentPlayer);
+		currentPlayer = players.get(0);
+	}
+
+}

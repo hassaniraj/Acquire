@@ -46,14 +46,11 @@ public class IAdministrator implements Administrator {
 
 	@Override
 	public void setAllTiles(Board board) {
-		System.out.println(board.getColumns());
-		System.out.println(board.getRows());
 		for (String column : board.getColumns()) {
 			for (String row : board.getRows()) {
 				allTiles.add(new Tile().getTileLabel(row, column));
 			}
 		}
-		System.out.println(allTiles.size());
 	}
 
 	@Override
@@ -96,13 +93,7 @@ public class IAdministrator implements Administrator {
 	public String setTile(Board board, Player player, Tile tile, String label) {
 		AcquireActions acquireActions = AcquireActionsFactory.getInstance();
 		String type = acquireActions.inspect(board, tile.getRow(), tile.getColumn());
-		System.out.println(type);
-		if (type == null) {
-			System.out.println(type);
-		}
-		if (type.equals("merging")) {
-			System.out.println("merging case");
-		}
+		
 		if (type.equals(Config.Moves.SINGLETON.getMove())) {
 			acquireActions.singleton(board, tile.getRow(), tile.getColumn());
 			player.removeTile(tile);
@@ -137,8 +128,7 @@ public class IAdministrator implements Administrator {
 			player.removeTile(tile);
 			return Config.Moves.SINGLETON.getMove();
 		}
-		System.out.println("No match");
-		return null;
+		return "No match";
 	}
 
 	@Override
@@ -447,6 +437,17 @@ public class IAdministrator implements Administrator {
 			}
 
 		}
+	}
+
+	@Override
+	public void removeTile(Board board, Tile tile) {
+		//Hotel hotel = board.getBoard().get(tile);
+		board.getBoard().remove(tile.getColumn()+tile.getRow());
+	}
+	
+	@Override
+	public void addAllTiles(String tile) {
+		allTiles.add(tile);
 	}
 
 }

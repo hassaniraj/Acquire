@@ -1,0 +1,127 @@
+package com.acquire.player.strategy;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import com.acquire.board.Board;
+import com.acquire.board.Chain;
+import com.acquire.exception.AcquireException;
+import com.acquire.game.tree.state.StateClient;
+import com.acquire.player.Player;
+import com.acquire.player.Share;
+
+public class MaximumSharesStrategy implements PlayerStrategy {
+
+	@Override
+	public List<String> buyShare() throws AcquireException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Object> playTile(Player player, List<String> hotels) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StateClient playTile(StateClient root, List<StateClient> children) {
+		StateClient state = minimaxExecute(root.getState().getBoard(), root,
+				true);
+		return state;
+	}
+
+	@Override
+	public List<String> buyShare(StateClient stateClient,
+			Set<List<String>> shareCombinations) {
+		// TODO Auto-generated method stub
+		Iterator<List<String>> iter = shareCombinations.iterator();
+
+		while (iter.hasNext() && shareCombinations.size() > 0) {
+			List<String> nextELement = iter.next();
+			if (nextELement.size() == 3) {
+				return nextELement;
+			}
+		}
+
+		return new ArrayList<>();
+	}
+
+	public StateClient minimaxExecute(Board board, StateClient root, boolean MAX) {
+		// Map<StateClient, Integer> score = new HashMap<>();
+		root.setScore(-9999999);
+		StateClient state = minimax(board, root, MAX, -9999999);
+		return state;
+	}
+
+	public StateClient minimax(Board board, StateClient root, boolean MAX,
+			int alpha) {
+		// StateClient root = scoreMap.keySet().iterator().next();
+		if (root.getNextPlayer() == null) {
+			Player player = evaluationOnShares(root.getPlayer());
+			root.setScore(player.getScore());
+			return root;
+		}
+		if (MAX) {
+			List<StateClient> children = root.getChildren();
+			StateClient maxChild = new StateClient();
+			alpha = -9999999;
+			for (StateClient child : children) {
+				// Map<StateClient, Integer> nextScore = new HashMap<>();
+				// nextScore.put(child, alpha);
+				StateClient value = minimax(board, child, !MAX, alpha);
+				alpha = alpha < value.getScore() ? value.getScore() : alpha;
+				child.setScore(alpha);
+				maxChild = child;
+			}
+			return maxChild;
+		} else if (!MAX) {
+			List<StateClient> children = root.getChildren();
+			StateClient minChild = new StateClient();
+			alpha = 9999999;
+			for (StateClient child : children) {
+				// Map<StateClient, Integer> nextScore = new HashMap<>();
+				// nextScore.put(child, alpha);
+				StateClient value = minimax(board, child, !MAX, alpha);
+				alpha = alpha > value.getScore() ? value.getScore() : alpha;
+				child.setScore(alpha);
+				minChild = child;
+			}
+			return minChild;
+		}
+		return null;
+	}
+
+	public Player evaluationOnShares(Player player) {
+		Map<String, Integer> chainMap = new HashMap<>();
+		Map<String, List<String>> chainLabels = new HashMap<>(Chain.getChain());
+		int max = 0;
+		String hotelName = "";
+		for (String chain : Chain.getChain().keySet()) {
+			if (Chain.getChain(chain).isEmpty())
+				chainLabels.remove(chain);
+		}
+		for (Map.Entry<String, List<String>> entry : chainLabels.entrySet()) {
+			int count = entry.getValue().size();
+			chainMap.put(entry.getKey(), count);
+		}
+		for (Map.Entry<String, Integer> entry : chainMap.entrySet()) {
+			if (entry.getValue() > max) {
+				max = entry.getValue();
+				hotelName = entry.getKey();
+			}
+		}
+		if (player.getShares().containsKey(hotelName)) {
+			int score = player.getShare(hotelName);
+			player.setScore(score);
+
+		} else {
+			player.setScore(0);
+		}
+		return player;
+	}
+}

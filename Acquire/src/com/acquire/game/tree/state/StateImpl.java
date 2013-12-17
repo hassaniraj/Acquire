@@ -63,9 +63,7 @@ public class StateImpl implements State {
 		Map<String, Integer> shareCount = new HashMap<>(Share.getShare());
 		shareCombinations.clear();
 		hotels = new ArrayList<String>(board.getHotelTiles().keySet());
-		System.out.println(hotels);
-		if (Share.getShare("American") == 1)
-			System.out.println("one left");
+		
 		for (int i = 0; i < hotels.size(); i++) {
 			if (shareCount.get(hotels.get(i)) > 0) {
 				shareCombinations.add(new ArrayList<>(Arrays.asList(hotels

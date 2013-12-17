@@ -44,7 +44,6 @@ public class MaximumWorthStrategy implements PlayerStrategy {
 		while (iter.hasNext() && shareCombinations.size() > 0) {
 			List<String> nextELement = iter.next();
 			if (nextELement.size() == 3) {
-				System.out.println("Shares: " + nextELement);
 				return nextELement;
 			}
 		}

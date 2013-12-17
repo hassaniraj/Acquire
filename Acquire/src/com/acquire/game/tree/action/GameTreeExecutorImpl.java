@@ -61,7 +61,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		AdminTreeInspector adminTreeInspector = new AdminTreeInspectorImpl();
 		GameTreeExecutor gameTreeExecutor = new GameTreeExecutorImpl();
 		PlayerTreeInspector playerTreeInspector = new PlayerTreeInspectorImpl();
-		for (int i = 0; i < 1000; i++) {
+		for (int i = 0; i < Integer.parseInt("1"); i++) {
 			List<Player> playersList = new ArrayList<>();
 			
 			Player player1 = new Player();
@@ -79,10 +79,10 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			player4.setStrategy(new MaximumSharesStrategy());
 			playersList.add(player4);
 			
-			Player player3 = new Player();
-			player3.setName("worth");
-			player3.setStrategy(new MaximumWorthStrategy());
-			playersList.add(player3);
+//			Player player3 = new Player();
+//			player3.setName("worth");
+//			player3.setStrategy(new MaximumWorthStrategy());
+//			playersList.add(player3);
 			List<Player> players=new ArrayList<>();
 			Random random=new Random();
 			int size=playersList.size();
@@ -90,7 +90,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 				int index=random.nextInt(playersList.size());
 				players.add(playersList.remove(index));
 			}
-			System.out.println(players.size());
+			
 			Board board = adminTreeInspector.init(players);
 			players = Game.getInstance().getGame(board);
 			gameTreeExecutor = new GameTreeExecutorImpl();
@@ -114,10 +114,11 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			// System.out.println("Game ended! ");
 
 		}
+		System.out.println("result: " + results);
 		// if (results.get(adminController.getWinner()) != null)
 		// current += results.get(adminController.getWinner());
 
-		System.out.println("Final Stats: " + results);
+		
 
 	}
 
@@ -129,10 +130,9 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		// List<Tile> tiles = root.getNextPlayer().getTile();
 		int i = 0;
 		while (!isEnd()) {
-			System.out.println(i++);
 
 			if (i == 54) {
-				System.out.println(i);
+				
 			}
 			// root.setPlayer(currentPlayer);
 			// List<Tile> tiles = root.getState().getPlayers()
@@ -148,13 +148,10 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			// root.getChildren().add(child);
 			// }
 			List<Tile> tiles = root.getNextPlayer().getTile();
-			System.out.println(root.getNextPlayer().getName());
-			for (Tile tile : tiles) {
-				System.out.print(tile.getColumn() + tile.getRow() + " ");
-			}
-			System.out.println("");
+			
 			StateClient state = playerTreeInspector.pickState(root,
 					root.getNextPlayer());
+			System.out.println(adminTreeInspector.emptyTiles().size());
 			if (state == null)
 				break;
 			if (isEnd())
@@ -162,13 +159,11 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 			// System.out.println(state.getMove());
 			// System.out.println(state.getTile().getColumn()
 			// + state.getTile().getRow());
+			
+			System.out.println("placed tile:" + state.getTile().getColumn()+state.getTile().getRow());
 			adminTreeInspector.place(state.getTile(), state.getMove(), state,
 					root.getNextPlayer());
-			System.out.println("Tiles on board "
-					+ state.getState().getBoard().getOccupiedTiles().size());
-			System.out.println("Tile placed:" + state.getTile().getColumn()
-					+ state.getTile().getRow());
-
+			
 			root.getState().setShareCombinations();
 			state.getState().setHotels(getHotels());
 			// root = state;
@@ -181,6 +176,7 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		List<Player> playersFinalScore = Game.getInstance().getGame(board);
 		String winner = adminTreeInspector.getWinner(board);
 		System.out.println("The winner is " + winner);
+		
 	}
 
 	@Override
@@ -256,14 +252,14 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		state.setChildren(new ArrayList<StateClient>());
 		List<Tile> tiles = state.getState().getPlayers()
 				.get(state.getNextPlayer());
-
+		List <Tile> t = new ArrayList<>(tiles);
 		// for (Tile tile : tiles) {
 		// System.out.print(tile.getColumn()+tile.getRow() + " ");
 		// }
 
 		// playerCount++;
 		if (playerCount < 1) {
-			for (Tile tile : tiles) {
+			for (Tile tile : t) {
 				if (!state.getPath().contains(
 						tile.getTileLabel(tile.getRow(), tile.getColumn()))) {
 					// System.out.println("\nPlayer " + playerCount);
@@ -352,6 +348,8 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		}
 
 		for (Tile boardTile : boardTiles) {
+			System.out.println(boardTile.getColumn()+boardTile.getRow() + " " + allTilesClone.indexOf(boardTile));
+			System.out.println("size: " + allTilesClone.size());
 			allTilesClone.remove(allTilesClone.indexOf(boardTile));
 		}
 		// System.out.println("SIze:" + allTilesClone.size());
@@ -412,52 +410,4 @@ public class GameTreeExecutorImpl implements GameTreeExecutor {
 		}
 		return null;
 	}
-
-	public List<Player> evaluationOnWorth(List<Player> players) {
-		for (Player player : players) {
-			Map<String, Integer> playerShares = player.getShares();
-			int cash = player.getCash();
-			int worthOfAPlayer = 0;
-			for (Map.Entry<String, Integer> playerSharesEntry : playerShares
-					.entrySet()) {
-				String label = playerSharesEntry.getKey();
-				int numberOfShares = playerSharesEntry.getValue();
-				int sharePrice = Share.getSharePrice(label);
-				worthOfAPlayer += (sharePrice * numberOfShares);
-			}
-			worthOfAPlayer += cash;
-			player.setPresentWorth(worthOfAPlayer);
-		}
-		return players;
-	}
-
-	public Player evaluationOnShares(Player player) {
-		Map<String, Integer> chainMap = new HashMap<>();
-		Map<String, List<String>> chainLabels = new HashMap<>(Chain.getChain());
-		int max = 0;
-		String hotelName = "";
-		for (String chain : Chain.getChain().keySet()) {
-			if (Chain.getChain(chain).isEmpty())
-				chainLabels.remove(chain);
-		}
-		for (Map.Entry<String, List<String>> entry : chainLabels.entrySet()) {
-			int count = entry.getValue().size();
-			chainMap.put(entry.getKey(), count);
-		}
-		for (Map.Entry<String, Integer> entry : chainMap.entrySet()) {
-			if (entry.getValue() > max) {
-				max = entry.getValue();
-				hotelName = entry.getKey();
-			}
-		}
-		if (player.getShares().containsKey(hotelName)) {
-			int score = player.getShare(hotelName);
-			player.setScore(score);
-
-		} else {
-			player.setScore(0);
-		}
-		return player;
-	}
-
 }

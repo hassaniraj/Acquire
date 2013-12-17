@@ -1,0 +1,5 @@
+package com.acquire.request;
+
+public class OutputHandler {
+	
+}

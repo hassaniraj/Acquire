@@ -76,4 +76,8 @@ public interface Administrator {
 	void sell(Board board, Set<String> acquired);
 
 	List<String> getEmptyTiles();
+	
+	void removeTile(Board board, Tile tile);
+
+	void addAllTiles(String tile);
 }

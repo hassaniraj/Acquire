@@ -1,0 +1,92 @@
+package com.acquire.network;
+
+
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.acquire.request.GameHandler;
+import com.acquire.request.RequestHandler;
+
+public class GameServer {
+	private static GameHandler game = new GameHandler();
+	private boolean gameStarted = false;
+	private static int playerCount = 0;
+
+	public static void main(String[] args) {
+		GameServer gameServer = new GameServer();
+		
+		System.out.println("Started game server... waiting for connection... ");
+		class ClientConnection implements Runnable {
+			private Socket client;
+			private GameServer gameServer;
+
+			public ClientConnection(Socket client, GameServer gameServer) {
+				this.client = client;
+				this.gameServer = gameServer;
+			}
+
+			public void run() {
+				BufferedReader inFromClient;
+				try {
+					inFromClient = new BufferedReader(new InputStreamReader(
+							client.getInputStream()));
+
+					DataOutputStream outToClient = new DataOutputStream(
+							client.getOutputStream());
+					while (true) {
+						String clientSentence = inFromClient.readLine();
+						if (clientSentence != null)
+							game.processRequest(new StringBuilder(clientSentence));
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		ServerSocket server = null;
+		try {
+			server = new ServerSocket(5432);
+		} catch (IOException e) {
+			System.err.println("Could not listen on port: " + 5432);
+			System.err.println(e);
+			System.exit(1);
+		}
+
+		Socket client = null;
+		while (true) {
+			try {
+				client = server.accept();
+				System.out.println("Connected " + playerCount + " players" );
+				playerCount ++;
+			} catch (IOException e) {
+				try {
+					server.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				System.err.println("Server did not accept client");
+				System.err.println(e);
+				System.exit(1);
+			}
+			Thread t = new Thread(new ClientConnection(client, gameServer));
+			t.start();
+		}
+		
+	}
+}

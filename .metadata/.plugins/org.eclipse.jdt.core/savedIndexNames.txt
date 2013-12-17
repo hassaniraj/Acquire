@@ -1,0 +1,23 @@
+INDEX VERSION 1.126+C:\Users\Shreya\Documents\Semester 3\p532\acquire\pair18\pair18-acquire\.metadata\.plugins\org.eclipse.jdt.core
+163172794.index
+1697886153.index
+611043693.index
+183590576.index
+1498219845.index
+401269672.index
+3974580528.index
+2787815456.index
+2699478153.index
+1244243964.index
+30765161.index
+3133528496.index
+1132452898.index
+4097039620.index
+2876146919.index
+305854171.index
+3065916431.index
+1115467115.index
+1995173708.index
+3849042482.index
+3077960221.index
+4155206848.index

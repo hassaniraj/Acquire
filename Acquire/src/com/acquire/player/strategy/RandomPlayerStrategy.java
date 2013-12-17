@@ -9,14 +9,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
-import com.acquire.admin.Administrator;
-import com.acquire.admin.IAdministrator;
-import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Labels;
 import com.acquire.board.Tile;
 import com.acquire.exception.AcquireException;
-import com.acquire.factory.BoardFactory;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 

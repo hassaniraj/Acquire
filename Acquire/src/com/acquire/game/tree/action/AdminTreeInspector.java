@@ -32,4 +32,14 @@ public interface AdminTreeInspector {
 	String getWinner(Board board);
 
 	List<String> emptyTiles();
+
+	Board getBoard();
+
+	void setBoard(Board board);
+	
+	StateClient getRoot();
+	
+	StateClient setRoot(StateClient stateClient);
+
+	boolean isEnd();
 }

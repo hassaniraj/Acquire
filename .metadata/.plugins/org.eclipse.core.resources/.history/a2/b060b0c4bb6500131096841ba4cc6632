@@ -1,0 +1,92 @@
+package com.acquire.network;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import com.acquire.exception.AcquireException;
+import com.acquire.request.RequestHandler;
+
+public class GameClient {
+	public static void main(String argv[]) throws AcquireException {
+		Socket sock;
+
+        String sentence; 
+        String modifiedSentence; 
+		try {
+			
+			while(true){
+		        BufferedReader inFromUser = 
+		          new BufferedReader(new InputStreamReader(System.in)); 
+
+		        Socket clientSocket = new Socket("localhost", 6789); 
+
+		        DataOutputStream outToServer = 
+		          new DataOutputStream(clientSocket.getOutputStream());
+
+
+		        BufferedReader inFromServer =
+		          new BufferedReader(new
+		          InputStreamReader(clientSocket.getInputStream()));
+
+		        sentence = inFromUser.readLine();
+
+		        outToServer.writeBytes(sentence + '\n');
+
+		        modifiedSentence = inFromServer.readLine();
+
+		        System.out.println("FROM SERVER: " + modifiedSentence);
+
+		        if(modifiedSentence.equals("quit\n")) clientSocket.close();
+
+		}
+			
+//			sock = new Socket("127.0.0.1", 5432);
+
+//			BufferedReader fromUser = new BufferedReader(new InputStreamReader(
+//					System.in));
+//			OutputStream ostream = sock.getOutputStream();
+//			PrintWriter pwrite = new PrintWriter(ostream, true);
+//			InputStream istream = sock.getInputStream();
+//			BufferedReader receiveRead = new BufferedReader(
+//					new InputStreamReader(istream));
+//			// System.out.println("Enter the XML: ");
+//			String receiveMessage, sendMessage;
+//			StringBuilder string = new StringBuilder();
+//			RequestHandler requestHandler = new RequestHandler();
+//			String str = "";
+//			while (true) {
+//				// if (str.equals("")) {
+//				 pwrite.println(string.toString() + "\n");
+//				 System.out.flush();
+//				if ((receiveMessage = receiveRead.readLine()) != null) {
+//					System.out.println(receiveMessage);
+//				}
+//
+//				str = requestHandler.start(receiveMessage);
+//				if (str.equals("")) {
+//
+//				}
+//				System.out.println("echo:" + str);
+//				string.append(str);
+//				string.append(" ");
+//				pwrite.println(string.toString() + "\n");
+//				System.out.flush();
+//
+//				string.setLength(0);
+//
+//			}
+//		} catch (UnknownHostException e) {
+//
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+	}
+}

@@ -5,7 +5,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -29,9 +31,11 @@ import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.board.Hotel;
 import com.acquire.board.Tile;
+import com.acquire.config.Config.Strategy;
 import com.acquire.exception.AcquireException;
 import com.acquire.factory.BoardFactory;
 import com.acquire.factory.PlayerFactory;
+import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
 import com.acquire.player.strategy.LargestAlphaStrategy;
@@ -41,106 +45,71 @@ import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
 
 public class RequestHandler {
-	public void start(String string) {
-		try {
-			RequestHandler requestHandler = new RequestHandler();
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder builder;
-
-			builder = builderFactory.newDocumentBuilder();
-
-			Document doc = builder.newDocument();
-
-			doc = builder.parse(new InputSource(new ByteArrayInputStream(string
-					.toString().getBytes("utf-8"))));
-			doc.getDocumentElement().normalize();
-			getBoard(doc);
-			Player player = getPlayer(doc);
-			setShares(player, doc);
-			List<String> hotelList = getHotels(doc);
-			System.out
-					.println("Enter the strategy you wish to take: \n1. Sequential \n2. Random \n Enter selection:");
-			Scanner s = new Scanner(System.in);
-			List<Object> place;
-			List<String> hotels;
-			if (s.next().equals("1")) {
-				PlayerStrategy sequentialPlayerStrategy = new LargestAlphaStrategy();
-				place = sequentialPlayerStrategy.playTile(player, hotelList);
-				hotels = sequentialPlayerStrategy.buyShare();
-			} else {
-				PlayerStrategy randomPlayerStrategy = new RandomPlayerStrategy();
-				place = randomPlayerStrategy.playTile(player, hotelList);
-				hotels = randomPlayerStrategy.buyShare();
-			}
-			writeResponse(place, hotels);
-		} catch (ParserConfigurationException e) {
-			try {
-				this.writeError("Format error in xml input");
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (UnsupportedEncodingException e) {
-			try {
-				this.writeError("Format error in xml input");
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (SAXException e) {
-			try {
-				this.writeError("Format error in xml input");
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (IOException e) {
-			try {
-				this.writeError("Format error in xml input");
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (AcquireException e) {
-			try {
-				this.writeError(e.getMessage());
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		} catch (TransformerException e) {
-			try {
-				this.writeError("Format error in xml input");
-			} catch (TransformerConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (ParserConfigurationException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+	public String start(String string, String strategy)
+			throws ParserConfigurationException, UnsupportedEncodingException,
+			SAXException, IOException, AcquireException, TransformerException {
+		PlayerStrategy playerStrategy = new SequentialPlayerStrategy();
+		if (strategy.equals("random")) {
+			playerStrategy = Strategy.RANDOM.getMove();
+		} else if (strategy.equals("sequential")) {
+			playerStrategy = Strategy.SEQ.getMove();
+		} else if (strategy.equals("smallest-anti")) {
+			playerStrategy = Strategy.SMALLESTANTI.getMove();
+		} else if (strategy.equals("largest-alpha")) {
+			playerStrategy = Strategy.LARGESTALPHA.getMove();
+		} else if (strategy.equals("worth")) {
+			playerStrategy = Strategy.WORTH.getMove();
+		} else if (strategy.equals("shares")) {
+			playerStrategy = Strategy.SHARES.getMove();
 		}
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder builder;
+
+		builder = builderFactory.newDocumentBuilder();
+
+		Document doc = builder.newDocument();
+
+		doc = builder.parse(new InputSource(new ByteArrayInputStream(string
+				.toString().getBytes("utf-8"))));
+		doc.getDocumentElement().normalize();
+		Board board = getBoard(doc);
+		Player player = getPlayer(doc);
+		setShares(player, doc);
+		List<String> hotelList = getHotels(doc);
+
+		StateClient root = new StateClient();
+		root.getState().setBoard(board);
+		root.setNextPlayer(player);
+		root.getState().setShareCombinations();
+		root.getState().setHotels(hotelList);
+
+		StateClient state = root;
+		root.setPath(new ArrayList<String>());
+		// for (Player name: players) {
+		// System.out.println(name.getName());
+		// }
+		// List<Player> players = Game.getInstance().getGame(board);
+
+		root = generateChildren(state, player, 0, board.getEmptyTiles());
+
+		//
+		//
+		StateClient node = playerStrategy.playTile(root, root.getChildren());
+		if (node != null) {
+			List<String> shares = playerStrategy.buyShare(state, root
+					.getState().getShareCombinations());
+			node.setShares(shares);
+		}
+		
+		return writeResponse(node.getTile(), node.getHotel(), node.getShares());
+
 	}
 
 	public Board getBoard(Document document) {
 		Board board = Board.getInstance();
-		board.clear();
-		board = Board.getInstance();
+		// board.clear();
+		// board = Board.getInstance();
 		new Chain();
 		NodeList tiles = document.getElementsByTagName("tile");
 		for (int i = 0; i < tiles.getLength(); i++) {
@@ -177,8 +146,9 @@ public class RequestHandler {
 		NodeList shares = element.getElementsByTagName("share");
 		for (int i = 0; i < shares.getLength(); i++) {
 			Element share = (Element) shares.item(i);
-			player.setShare(share.getAttribute("name"),
-					Integer.parseInt(share.getAttribute("count")));
+			if (!share.getAttribute("name").equals(""))
+				player.setShare(share.getAttribute("name"),
+						Integer.parseInt(share.getAttribute("count")));
 		}
 		NodeList nodeList = doc.getElementsByTagName("tile");
 		for (int i = 0; i < nodeList.getLength(); i++) {
@@ -225,18 +195,20 @@ public class RequestHandler {
 		NodeList hotels = doc.getElementsByTagName("hotel");
 		List<String> hotelList = new ArrayList<>();
 		for (int i = 0; i < hotels.getLength(); i++) {
-			Element element = (Element) hotels.item(i); 
+			Element element = (Element) hotels.item(i);
 			if (!element.getAttribute("label").equals(""))
 				if (!Chain.getChain(element.getAttribute("label")).isEmpty()) {
-				throw new AcquireException("The hotel " + element.getAttribute("label") + " already has a chain");
-			} else {
-				hotelList.add(element.getAttribute("label"));
-			}
+					throw new AcquireException("The hotel "
+							+ element.getAttribute("label")
+							+ " already has a chain");
+				} else {
+					hotelList.add(element.getAttribute("label"));
+				}
 		}
 		return hotelList;
 	}
 
-	public void writeResponse(List<Object> place, List<String> hotels)
+	public String writeResponse(Tile place, String shotel, List<String> hotels)
 			throws ParserConfigurationException, TransformerException {
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
 				.newInstance();
@@ -248,17 +220,17 @@ public class RequestHandler {
 				root.setAttribute("hotel" + (j + 1), hotels.get(j));
 			}
 		}
-		if (!place.isEmpty()) {
-			Element placeElement = doc.createElement("place");
-			Tile tile = (Tile) place.get(0);
-			placeElement.setAttribute("row", tile.getRow());
-			placeElement.setAttribute("column", tile.getColumn());
-			if (place.size() > 1)
-				placeElement.setAttribute("hotel", place.get(1).toString());
-			root.appendChild(placeElement);
-		}
-		doc.appendChild(root);
+		// if (!place.isEmpty()) {
+		Element placeElement = doc.createElement("place");
+		// Tile tile = (Tile) place.get(0);
+		placeElement.setAttribute("row", place.getRow());
+		placeElement.setAttribute("column", place.getColumn());
 
+		placeElement.setAttribute("hotel", shotel);
+		root.appendChild(placeElement);
+		// }
+		doc.appendChild(root);
+		System.out.println("Place tile " + place.getColumn()+place.getRow());
 		TransformerFactory transformerFactory = TransformerFactory
 				.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
@@ -268,10 +240,11 @@ public class RequestHandler {
 		StreamResult result = new StreamResult(new StringWriter());
 		result = new StreamResult(new StringWriter());
 		transformer.transform(source, result);
-		System.out.println(result.getWriter().toString());
+		return result.getWriter().toString();
+		// System.out.println(result.getWriter().toString());
 	}
 
-	String writeError(String msg) throws ParserConfigurationException,
+	public String writeError(String msg) throws ParserConfigurationException,
 			TransformerConfigurationException, IOException {
 		StreamResult result = new StreamResult(new StringWriter());
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory
@@ -299,4 +272,121 @@ public class RequestHandler {
 		}
 		return "";
 	}
+
+	public StateClient generateTree(Board board, StateClient stateClient,
+			Player player, List<String> remainingTiles, StateClient root) {
+		root = stateClient;
+		stateClient.getState().setBoard(board);
+		StateClient state = root;
+		root.setPath(new ArrayList<String>());
+		// for (Player name: players) {
+		// System.out.println(name.getName());
+		// }
+		// List<Player> players = Game.getInstance().getGame(board);
+		root = generateChildren(state, player, 0, remainingTiles);
+		return root;
+		// for (int i = 0; i < players.size(); i++) {
+
+		// }
+	}
+
+	public StateClient generateChildren(StateClient state, Player player,
+			int playerCount, List<String> remainingTiles) {
+		if (playerCount == 2) {
+			return state;
+		}
+
+		// for (Tile tile : tiles) {
+		// System.out.print(tile.getColumn()+tile.getRow() + " ");
+		// }
+
+		// playerCount++;
+		if (playerCount < 1) {
+			state.setNextPlayer(player);
+			state.setChildren(new ArrayList<StateClient>());
+			List<Tile> tiles = state.getNextPlayer().getTile();
+			List<Tile> t = new ArrayList<>(tiles);
+			for (Tile tile : t) {
+				if (!state.getPath().contains(
+						tile.getTileLabel(tile.getRow(), tile.getColumn()))) {
+					// System.out.println("\nPlayer " + playerCount);
+					//
+					// System.out.println("Current tile: " + tile.getColumn() +
+					// tile.getRow());
+					Map<String, Object> result = state.generate(state
+							.getState().getBoard(), tile.getRow(), tile
+							.getColumn());
+
+					StateClient child = new StateClient();
+					child.setMove(result.get("move").toString());
+
+					child.setTile((Tile) result.get("tile"));
+					state.getChildren().add(child);
+					child.setPlayer(player);
+					List<String> newPath = new ArrayList<>(state.getPath());
+					if (state.getTile() != null)
+						newPath.add(state.getTile().getTileLabel(
+								state.getTile().getRow(),
+								state.getTile().getColumn()));
+					else
+						newPath.add("root");
+					child.setPath(newPath);
+					// System.out.println(child.getPath());
+
+					generateChildren(child, player, playerCount + 1,
+							remainingTiles);
+					// System.out.println("\nPlayer Count:"+playerCount);
+				}
+			}
+		} else {
+			List<Tile> remaining = getAllTiles(state.getState().getBoard(),
+					player.getTile());
+			for (Tile tile : remaining) {
+
+				if (!state.getPath().contains(
+						tile.getTileLabel(tile.getRow(), tile.getColumn()))) {
+					// System.out.println("\nPlayer " + playerCount);
+					//
+					// System.out.println("Current tile: " + tile.getColumn() +
+					// tile.getRow());
+					Map<String, Object> result = state.generate(state
+							.getState().getBoard(), tile.getRow(), tile
+							.getColumn());
+
+					StateClient child = new StateClient();
+					child.setMove(result.get("move").toString());
+
+					child.setTile((Tile) result.get("tile"));
+					state.getChildren().add(child);
+					child.setPlayer(player);
+					List<String> newPath = new ArrayList<>(state.getPath());
+					if (state.getTile() != null)
+						newPath.add(state.getTile().getTileLabel(
+								state.getTile().getRow(),
+								state.getTile().getColumn()));
+					else
+						newPath.add("root");
+					child.setPath(newPath);
+					// System.out.println(child.getPath());
+
+					generateChildren(child, player, playerCount + 1,
+							remainingTiles);
+					// System.out.println("\nPlayer Count:"+playerCount);
+				}
+			}
+		}
+		return state;
+	}
+
+	public List<Tile> getAllTiles(Board board, List<Tile> playerTiles) {
+		List<Tile> tiles = new ArrayList<>();
+		for (String tile : board.getEmptyTiles()) {
+			Tile t = new Tile();
+			t.setColumn(tile.substring(0, tile.length() - 1));
+			t.setRow(tile.substring(tile.length() - 1));
+			tiles.add(t);
+		}
+		return tiles;
+	}
+
 }

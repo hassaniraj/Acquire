@@ -7,14 +7,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.acquire.admin.Administrator;
+import com.acquire.admin.IAdministrator;
 import com.acquire.board.Board;
 import com.acquire.board.Chain;
 import com.acquire.exception.AcquireException;
+import com.acquire.factory.BoardFactory;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
 
 public class MaximumSharesStrategy implements PlayerStrategy {
+	Administrator admin = IAdministrator.getInstance();
 
 	@Override
 	public List<String> buyShare() throws AcquireException {
@@ -30,8 +34,10 @@ public class MaximumSharesStrategy implements PlayerStrategy {
 
 	@Override
 	public StateClient playTile(StateClient root, List<StateClient> children) {
-		StateClient state = minimaxExecute(root.getState().getBoard(), root,
-				true);
+		Board b = BoardFactory.getBoard();
+		b = root.getState().getBoard();
+
+		StateClient state = minimaxExecute(b, root, true);
 		return state;
 	}
 
@@ -44,7 +50,6 @@ public class MaximumSharesStrategy implements PlayerStrategy {
 		while (iter.hasNext() && shareCombinations.size() > 0) {
 			List<String> nextELement = iter.next();
 			if (nextELement.size() == 3) {
-				System.out.println("Shares: " + nextELement);
 				return nextELement;
 			}
 		}
@@ -74,6 +79,7 @@ public class MaximumSharesStrategy implements PlayerStrategy {
 			for (StateClient child : children) {
 				// Map<StateClient, Integer> nextScore = new HashMap<>();
 				// nextScore.put(child, alpha);
+
 				StateClient value = minimax(board, child, !MAX, alpha);
 				alpha = alpha < value.getScore() ? value.getScore() : alpha;
 				child.setScore(alpha);
@@ -95,24 +101,6 @@ public class MaximumSharesStrategy implements PlayerStrategy {
 			return minChild;
 		}
 		return null;
-	}
-
-	public Player evaluationOnWorth(Player player) {
-		// for(Player player: players){
-		Map<String, Integer> playerShares = player.getShares();
-		int cash = player.getCash();
-		int worthOfAPlayer = 0;
-		for (Map.Entry<String, Integer> playerSharesEntry : playerShares
-				.entrySet()) {
-			String label = playerSharesEntry.getKey();
-			int numberOfShares = playerSharesEntry.getValue();
-			int sharePrice = Share.getSharePrice(label);
-			worthOfAPlayer += (sharePrice * numberOfShares);
-		}
-		worthOfAPlayer += cash;
-		player.setPresentWorth(worthOfAPlayer);
-		// }
-		return player;
 	}
 
 	public Player evaluationOnShares(Player player) {

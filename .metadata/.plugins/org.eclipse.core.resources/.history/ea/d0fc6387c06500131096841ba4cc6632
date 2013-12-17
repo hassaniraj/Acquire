@@ -1,0 +1,243 @@
+package com.acquire.request;
+
+import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
+import com.acquire.board.Board;
+import com.acquire.board.Hotel;
+import com.acquire.board.Labels;
+import com.acquire.board.Tile;
+import com.acquire.config.Config.Moves;
+import com.acquire.exception.AcquireException;
+import com.acquire.game.tree.action.AdminTreeInspector;
+import com.acquire.player.Player;
+import com.acquire.player.Share;
+import com.acquire.player.strategy.PlayerStrategy;
+import com.acquire.player.strategy.RandomPlayerStrategy;
+
+public class AdminInputHandler {
+	public void writeResponse(AdminTreeInspector adminTreeInspector, Player currentPlayer, List<Object> place, List<String> hotels)
+			throws ParserConfigurationException, TransformerException, IOException {
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder builder = builderFactory.newDocumentBuilder();
+		Document doc = builder.newDocument();
+		Element root = doc.createElement("take-turn");
+		
+		root.appendChild(setPlayer(currentPlayer, doc));
+
+		root.appendChild(setBoard(adminTreeInspector.getBoard(), doc));
+		
+		root = setTiles(currentPlayer, doc, root);
+		root = setShares(adminTreeInspector.getBoard(), doc, root);
+		
+		root = setXhotel(adminTreeInspector.getBoard(), doc, root);
+		
+		
+//		if (!hotels.isEmpty()) {
+//			for (int j = 0; j < hotels.size(); j++) {
+//				root.setAttribute("hotel" + (j + 1), hotels.get(j));
+//			}
+//		}
+//		if (!place.isEmpty()) {
+//			Element placeElement = doc.createElement("place");
+//			Tile tile = (Tile) place.get(0);
+////			placeElement.setAttribute("row", tile.row);
+////			placeElement.setAttribute("column", tile.column);
+//			if (place.size() > 1)
+//				placeElement.setAttribute("hotel", place.get(1).toString());
+//			root.appendChild(placeElement);
+//		}
+		doc.appendChild(root);
+
+		TransformerFactory transformerFactory = TransformerFactory
+				.newInstance();
+		Transformer transformer = transformerFactory.newTransformer();
+		DOMSource source;
+
+		source = new DOMSource(doc);
+		StreamResult result = new StreamResult(new StringWriter());
+		result = new StreamResult(new StringWriter());
+		transformer.transform(source, result);
+		DataOutputStream outToClient = new DataOutputStream(
+				currentPlayer.getClientID().getOutputStream());
+		outToClient.writeBytes(result.getWriter().toString() + "\n");
+	}
+	
+	public Element setPlayer(Player currentPlayer, Document doc) {
+		Element playerElement = doc.createElement("player");
+		playerElement.setAttribute("cash", Integer.toString(currentPlayer.getCash()));
+		
+		Element playerSharesElement = doc.createElement("share");
+		Map<String, Integer> shares = currentPlayer.getShares();
+		for (Map.Entry<String, Integer> values: shares.entrySet()) {
+			playerSharesElement.setAttribute(values.getKey(), Integer.toString(values.getValue()));
+		}
+		playerElement.appendChild(playerSharesElement);
+		return playerElement;
+	}
+	
+	public Element setBoard(Board board, Document doc) {
+		Element boardElement = doc.createElement("board");
+		Map<String, Hotel> tiles = board.getOccupiedTiles();
+		for (Map.Entry<String, Hotel> tilesMap: tiles.entrySet()) {
+			Element boardTileElement = doc.createElement("tile");
+			if (!tilesMap.getValue().getLabel().equals(Moves.SINGLETON)) {
+				Element hotelElement = doc.createElement("hotel");
+				hotelElement.setAttribute("name", tilesMap.getValue().getLabel());
+				boardTileElement.setAttribute("column", tilesMap.getKey().substring(0, tilesMap.getKey().length() - 1));
+				boardTileElement.setAttribute("row", tilesMap.getKey().substring(tilesMap.getKey().length() - 1));
+				hotelElement.appendChild(boardTileElement);
+				boardElement.appendChild(hotelElement);
+			}
+			boardTileElement.setAttribute("column", tilesMap.getKey().substring(0, tilesMap.getKey().length() - 1));
+			boardTileElement.setAttribute("row", tilesMap.getKey().substring(tilesMap.getKey().length() - 1));
+			boardElement.appendChild(boardTileElement);
+		}
+		return boardElement;
+	}
+	
+	public Element setTiles(Player player, Document doc, Element root) {
+		//Element tileElement = doc.createElement("tile");
+		List<Tile> availTiles = player.getTile();
+		
+		for (Tile tile: availTiles) {
+			Element boardTileElement = doc.createElement("tile");
+			boardTileElement.setAttribute("column", tile.getColumn());
+			boardTileElement.setAttribute("row", tile.getRow());
+			root.appendChild(boardTileElement);
+		}
+		return root;
+	}
+	
+	public Element setShares(Board board, Document doc, Element root) {
+		
+		Map<String, Integer> shares = Share.getShare();
+		
+		for (Map.Entry<String, Integer> values: shares.entrySet()) {
+			Element shareElement = doc.createElement("share");
+			shareElement.setAttribute("name", values.getKey());
+			shareElement.setAttribute("count", Integer.toString(values.getValue()));
+			root.appendChild(shareElement);
+		}
+		return root;
+	}
+	
+	public Element setXhotel(Board board, Document doc, Element root) {
+		Set<String> hotels = new HashSet<>(Labels.getLabels());
+		hotels.removeAll(board.getHotelTiles().keySet());
+		
+		for (String hotel: hotels) {
+			Element boardTileElement = doc.createElement("hotel");
+			boardTileElement.setAttribute("label", hotel);
+			root.appendChild(boardTileElement);
+		}
+		return root;
+	}
+	
+	public void parseInput(AdminTreeInspector adminTreeInspector, String xml) {
+		Board board = adminTreeInspector.getBoard();
+		try {
+			DocumentBuilderFactory builderFactory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder builder;
+			
+			builder = builderFactory.newDocumentBuilder();
+
+			Document doc = builder.newDocument();
+
+			doc = builder.parse(new InputSource(new ByteArrayInputStream(xml
+					.toString().getBytes("utf-8"))));
+			doc.getDocumentElement().normalize();
+			getMove(doc, board);
+			
+//			return writeResponse(place, hotels);
+		} catch (ParserConfigurationException e) {
+			try {
+//				this.writeError("Format error in xml input");
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (UnsupportedEncodingException e) {
+			try {
+//				this.writeError("Format error in xml input");
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (SAXException e) {
+			try {
+//				this.writeError("Format error in xml input");
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (IOException e) {
+			try {
+//				this.writeError("Format error in xml input");
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (AcquireException e) {
+			try {
+//				this.writeError(e.getMessage());
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		} catch (TransformerException e) {
+			try {
+//				this.writeError("Format error in xml input");
+			} catch (TransformerConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (ParserConfigurationException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+	}
+	
+	public void getMove(Document doc, Board board) {
+		Element action = doc.getElementById("action");
+	}
+}

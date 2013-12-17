@@ -1,11 +1,21 @@
 package com.acquire.config;
 
+import com.acquire.player.strategy.LargestAlphaStrategy;
+import com.acquire.player.strategy.MaximumSharesStrategy;
+import com.acquire.player.strategy.MaximumWorthStrategy;
+import com.acquire.player.strategy.PlayerStrategy;
+import com.acquire.player.strategy.RandomPlayerStrategy;
+import com.acquire.player.strategy.SequentialPlayerStrategy;
+import com.acquire.player.strategy.SmallestAntiStrategy;
+
 public class Config {
-		
-	public static final int MAX_CHAIN_SIZE=41;
-	
-	public static final int SAFE_CHAIN_SIZE=11;
-	
+
+	public static final int MAX_CHAIN_SIZE = 41;
+
+	public static final int SAFE_CHAIN_SIZE = 11;
+
+	public static final int MAX_PLAYERS = 4;
+
 	public static enum Moves {
 		SINGLETON("singleton"), FOUNDING("founding"), MERGING("merging"), GROWING(
 				"growing"), NONE("none");
@@ -17,6 +27,25 @@ public class Config {
 		}
 
 		public String getMove() {
+			return value;
+		}
+	}
+
+	public static enum Strategy {
+		RANDOM(new RandomPlayerStrategy()), 
+		SEQ(new SequentialPlayerStrategy()),
+		SMALLESTANTI(new SmallestAntiStrategy()),
+		LARGESTALPHA(new LargestAlphaStrategy()),
+		WORTH(new MaximumWorthStrategy()),
+		SHARES(new MaximumSharesStrategy());
+
+		PlayerStrategy value;
+
+		private Strategy(PlayerStrategy value) {
+			this.value = value;
+		}
+
+		public PlayerStrategy getMove() {
 			return value;
 		}
 	}

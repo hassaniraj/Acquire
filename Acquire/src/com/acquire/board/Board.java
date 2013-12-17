@@ -1,5 +1,6 @@
 package com.acquire.board;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -84,5 +85,16 @@ public class Board {
 	
 	public void clear() {
 		b = null;
+	}
+	
+	public List<String> getEmptyTiles() {
+		List<String> allTiles = new ArrayList<>();
+		for (String row: rows) {
+			for (String column: columns) {
+				allTiles.add(column + row);
+			}
+		}
+		allTiles.removeAll(board.keySet());
+		return allTiles;
 	}
 }

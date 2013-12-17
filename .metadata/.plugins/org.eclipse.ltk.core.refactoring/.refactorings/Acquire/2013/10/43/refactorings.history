@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;com.acquire.proxy.PlayerStrategyPicker&apos; to &apos;PlayerController&apos;&#x0D;&#x0A;- Original project: &apos;Acquire&apos;&#x0D;&#x0A;- Original element: &apos;com.acquire.proxy.PlayerStrategyPicker&apos;&#x0D;&#x0A;- Renamed element: &apos;com.acquire.proxy.PlayerController&apos;&#x0D;&#x0A;- Update references to refactored element&#x0D;&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;PlayerStrategyPicker&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src&lt;com.acquire.proxy{PlayerStrategyPicker.java[PlayerStrategyPicker" matchStrategy="1" name="PlayerController" qualified="false" references="true" similarDeclarations="false" stamp="1382652715811" textual="false" version="1.0"/>
+</session>

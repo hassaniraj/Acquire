@@ -1,0 +1,46 @@
+package com.acquire.network;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+import com.acquire.exception.AcquireException;
+
+public class GameClient {
+	public static void main(String argv[]) throws AcquireException {
+		Socket sock;
+		try {
+			
+
+			System.out.println("Establishing connection. Please wait ...");
+		      try
+		      {  sock = new Socket("127.0.0.1", 5432);
+		         System.out.println("Connected: " + socket);
+		         start();
+		      }
+		      catch(UnknownHostException uhe)
+		      {  System.out.println("Host unknown: " + uhe.getMessage());
+		      }
+		      catch(IOException ioe)
+		      {  System.out.println("Unexpected exception: " + ioe.getMessage());
+		      }
+		      String line = "";
+		      while (!line.equals(".bye"))
+		      {  try
+		         {  line = console.readLine();
+		            streamOut.writeUTF(line);
+		            streamOut.flush();
+		         }
+		         catch(IOException ioe)
+		         {  System.out.println("Sending error: " + ioe.getMessage());
+		         }
+		      }
+	}
+}
