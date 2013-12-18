@@ -45,51 +45,6 @@ public class GameClient {
 				sentence = requestHandler.start(modifiedSentence, args[2]);
 				outToServer.writeBytes(sentence + '\n');
 
-				// if(modifiedSentence.equals("quit\n")) clientSocket.close();
-
-				// sock = new Socket("127.0.0.1", 5432);
-
-				// BufferedReader fromUser = new BufferedReader(new
-				// InputStreamReader(
-				// System.in));
-				// OutputStream ostream = sock.getOutputStream();
-				// PrintWriter pwrite = new PrintWriter(ostream, true);
-				// InputStream istream = sock.getInputStream();
-				// BufferedReader receiveRead = new BufferedReader(
-				// new InputStreamReader(istream));
-				// // System.out.println("Enter the XML: ");
-				// String receiveMessage, sendMessage;
-				// StringBuilder string = new StringBuilder();
-				// RequestHandler requestHandler = new RequestHandler();
-				// String str = "";
-				// while (true) {
-				// // if (str.equals("")) {
-				// pwrite.println(string.toString() + "\n");
-				// System.out.flush();
-				// if ((receiveMessage = receiveRead.readLine()) != null) {
-				// System.out.println(receiveMessage);
-				// }
-				//
-				// str = requestHandler.start(receiveMessage);
-				// if (str.equals("")) {
-				//
-				// }
-				// System.out.println("echo:" + str);
-				// string.append(str);
-				// string.append(" ");
-				// pwrite.println(string.toString() + "\n");
-				// System.out.flush();
-				//
-				// string.setLength(0);
-				//
-				// }
-				// } catch (UnknownHostException e) {
-				//
-				// } catch (IOException e) {
-				// // TODO Auto-generated catch block
-				// e.printStackTrace();
-				// }
-
 			}
 		} catch (UnknownHostException e) {
 

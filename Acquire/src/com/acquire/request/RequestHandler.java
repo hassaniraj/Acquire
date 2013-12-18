@@ -35,6 +35,8 @@ import com.acquire.config.Config.Strategy;
 import com.acquire.exception.AcquireException;
 import com.acquire.factory.BoardFactory;
 import com.acquire.factory.PlayerFactory;
+import com.acquire.game.tree.action.PlayerProxy;
+import com.acquire.game.tree.action.PlayerTreeInspector;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.player.Share;
@@ -45,6 +47,8 @@ import com.acquire.player.strategy.SequentialPlayerStrategy;
 import com.acquire.player.strategy.SmallestAntiStrategy;
 
 public class RequestHandler {
+	PlayerTreeInspector playerTreeInspector = new PlayerProxy();
+	
 	public String start(String string, String strategy)
 			throws ParserConfigurationException, UnsupportedEncodingException,
 			SAXException, IOException, AcquireException, TransformerException {
@@ -86,21 +90,10 @@ public class RequestHandler {
 
 		StateClient state = root;
 		root.setPath(new ArrayList<String>());
-		// for (Player name: players) {
-		// System.out.println(name.getName());
-		// }
-		// List<Player> players = Game.getInstance().getGame(board);
 
 		root = generateChildren(state, player, 0, board.getEmptyTiles());
 
-		//
-		//
-		StateClient node = playerStrategy.playTile(root, root.getChildren());
-		if (node != null) {
-			List<String> shares = playerStrategy.buyShare(state, root
-					.getState().getShareCombinations());
-			node.setShares(shares);
-		}
+		StateClient node = playerTreeInspector.pickState(root, player);
 		
 		return writeResponse(node.getTile(), node.getHotel(), node.getShares());
 
@@ -108,8 +101,7 @@ public class RequestHandler {
 
 	public Board getBoard(Document document) {
 		Board board = Board.getInstance();
-		// board.clear();
-		// board = Board.getInstance();
+
 		new Chain();
 		NodeList tiles = document.getElementsByTagName("tile");
 		for (int i = 0; i < tiles.getLength(); i++) {

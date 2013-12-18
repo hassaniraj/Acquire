@@ -19,6 +19,7 @@ import com.acquire.board.Board;
 import com.acquire.board.Game;
 import com.acquire.config.Config;
 import com.acquire.config.Config.Strategy;
+import com.acquire.game.tree.action.AdminProxy;
 import com.acquire.game.tree.action.AdminTreeInspector;
 import com.acquire.game.tree.action.AdminTreeInspectorImpl;
 import com.acquire.game.tree.action.GameTreeExecutor;
@@ -27,10 +28,8 @@ import com.acquire.game.tree.action.PlayerTreeInspector;
 import com.acquire.game.tree.state.StateClient;
 import com.acquire.player.Player;
 import com.acquire.request.AdminInputHandler;
-import com.acquire.request.GameHandler;
 
 public class GameServer {
-	private static GameHandler game = new GameHandler();
 	private static int playerCount = 0;
 	private static AdminTreeInspector adminTreeInspector;
 	private static PlayerTreeInspector playerTreeInspector;
@@ -43,7 +42,7 @@ public class GameServer {
 		GameServer gameServer = new GameServer();
 		players = new ArrayList<>();
 		currentPlayer = new Player();
-		adminTreeInspector = new AdminTreeInspectorImpl();
+		adminTreeInspector = new AdminProxy();
 
 		System.out.println("Started game server... waiting for connection... ");
 		class ClientConnection implements Runnable {

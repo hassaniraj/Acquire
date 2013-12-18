@@ -31,15 +31,28 @@ public interface AdminTreeInspector {
 	 */
 	String getWinner(Board board);
 
+	/**
+	 * Get all empty tiles from board
+	 * @return
+	 */
 	List<String> emptyTiles();
-
-	Board getBoard();
-
-	void setBoard(Board board);
 	
+	/**
+	 * Get root of game tree
+	 * @return
+	 */
 	StateClient getRoot();
 	
+	/**
+	 * Set root of game tree
+	 * @param stateClient
+	 * @return
+	 */
 	StateClient setRoot(StateClient stateClient);
 
+	/**
+	 * Check if game has ended
+	 * @return
+	 */
 	boolean isEnd();
 }

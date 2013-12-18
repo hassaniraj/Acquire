@@ -1,0 +1,15 @@
+package com.acquire.game.tree.action;
+
+import com.acquire.game.tree.state.StateClient;
+import com.acquire.player.Player;
+
+public class PlayerProxy implements PlayerTreeInspector{
+	PlayerTreeInspector playerTreeInspector = new PlayertreeInspectorImpl();
+	
+	@Override
+	public StateClient pickState(StateClient root, Player player) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

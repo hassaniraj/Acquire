@@ -43,7 +43,7 @@ public class MaximumSharesStrategy implements PlayerStrategy {
 
 	@Override
 	public List<String> buyShare(StateClient stateClient,
-			Set<List<String>> shareCombinations) {
+			Set	<List<String>> shareCombinations) {
 		// TODO Auto-generated method stub
 		Iterator<List<String>> iter = shareCombinations.iterator();
 

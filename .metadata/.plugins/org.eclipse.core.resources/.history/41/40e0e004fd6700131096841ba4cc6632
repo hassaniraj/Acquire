@@ -1,0 +1,54 @@
+package com.acquire.game.tree.action;
+
+import java.util.List;
+
+import com.acquire.board.Board;
+import com.acquire.board.Tile;
+import com.acquire.game.tree.state.StateClient;
+import com.acquire.player.Player;
+
+public class AdminProxy implements AdminTreeInspector {
+	private AdminTreeInspector adminTreeInspector = new AdminTreeInspectorImpl();
+	
+	@Override
+	public Board init(List<Player> players) {
+		adminTreeInspector.init(players);
+	}
+
+	@Override
+	public void place(Tile tile, String type, StateClient root, Player player) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public String getWinner(Board board) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> emptyTiles() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StateClient getRoot() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public StateClient setRoot(StateClient stateClient) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isEnd() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}

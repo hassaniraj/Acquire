@@ -1,0 +1,14 @@
+package com.acquire.game.tree.action;
+
+import java.util.List;
+
+import com.acquire.game.tree.state.StateClient;
+
+public class PlayerProxy {
+	StateClient node = playerStrategy.playTile(root, root.getChildren());
+	if (node != null) {
+		List<String> shares = playerStrategy.buyShare(state, root
+				.getState().getShareCombinations());
+		node.setShares(shares);
+	}
+}

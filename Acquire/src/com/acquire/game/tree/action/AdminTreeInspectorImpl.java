@@ -22,16 +22,6 @@ public class AdminTreeInspectorImpl implements AdminTreeInspector {
 	private StateClient root;
 	
 	@Override
-	public Board getBoard() {
-		return board;
-	}
-
-	@Override
-	public void setBoard(Board board) {
-		this.board = board;
-	}
-
-	@Override
 	public Board init(List<Player> players) {
 		admin = IAdministrator.getInstance();
 		board = admin.startGame(Game.getInstance(), players);
